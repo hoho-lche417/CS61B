@@ -187,7 +187,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
         }
 
         Node p1 = this.sentinel.next;
-        Node p2 = other.sentinel.next;
+        Node p2 = (Node) other.sentinel.next;
 
         while (p1 != sentinel) {
             if (!p1.item.equals(p2.item)) {
