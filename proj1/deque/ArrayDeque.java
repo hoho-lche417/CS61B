@@ -166,7 +166,9 @@ public class ArrayDeque<T> implements Iterable<T> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArrayDeque<?> other)) return false;
+        if (!(o instanceof ArrayDeque<?>)) return false;
+
+        ArrayDeque<T> other = (ArrayDeque<T>) o;
         if (this.size != other.size) return false;
 
         for (int i = 0; i < size; i++) {
