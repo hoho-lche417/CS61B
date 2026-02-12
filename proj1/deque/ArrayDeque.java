@@ -167,16 +167,24 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
     /** Equality based on contents. */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ArrayDeque<?>)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArrayDeque<?>)) {
+            return false;
+        }
 
         ArrayDeque<T> other = (ArrayDeque<T>) o;
-        if (this.size != other.size) return false;
+        if (this.size != other.size) {
+            return false;
+        }
 
         for (int i = 0; i < size; i++) {
             T a = this.get(i);
             Object b = other.get(i);
-            if (!a.equals(b)) return false;
+            if (!a.equals(b)) {
+                return false;
+            }
         }
         return true;
     }
