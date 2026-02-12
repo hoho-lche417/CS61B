@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> element type
  */
-public class LinkedListDeque<T> implements Iterable<T> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     /** Sentinel node of the circular doubly linked list. */
     private final Node sentinel;
@@ -38,6 +38,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
     }
 
     /** Adds an item to the front of the deque. */
+    @Override
     public void addFirst(T item) {
         Node first = sentinel.next;
         Node newNode = new Node(item, sentinel, first);
@@ -47,6 +48,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
     }
 
     /** Adds an item to the back of the deque. */
+    @Override
     public void addLast(T item) {
         Node last = sentinel.prev;
         Node newNode = new Node(item, last, sentinel);
@@ -55,17 +57,14 @@ public class LinkedListDeque<T> implements Iterable<T> {
         size++;
     }
 
-    /** Returns true if the deque is empty. */
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
     /** Returns the number of items in the deque. */
+    @Override
     public int size() {
         return size;
     }
 
     /** Prints the deque from first to last. */
+    @Override
     public void printDeque() {
         Node current = sentinel.next;
         while (current != sentinel) {
@@ -76,6 +75,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
     }
 
     /** Removes and returns the first item, or null if empty. */
+    @Override
     public T removeFirst() {
         if (isEmpty()) {
             return null;
@@ -95,6 +95,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
     }
 
     /** Removes and returns the last item, or null if empty. */
+    @Override
     public T removeLast() {
         if (isEmpty()) {
             return null;
@@ -114,6 +115,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
     }
 
     /** Gets the item at the given index, or null if invalid. */
+    @Override
     public T get(int index) {
         if (index < 0 || index >= size) {
             return null;

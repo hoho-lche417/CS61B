@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> element type
  */
-public class ArrayDeque<T> implements Iterable<T> {
+public class ArrayDeque<T> implements Iterable<T>, Deque<T> {
 
     private static final int INITIAL_CAPACITY = 8;
 
@@ -30,6 +30,7 @@ public class ArrayDeque<T> implements Iterable<T> {
     }
 
     /** Adds an item to the front. */
+    @Override
     public void addFirst(T item) {
         if (size == items.length) {
             resize(items.length * 2);
@@ -40,6 +41,7 @@ public class ArrayDeque<T> implements Iterable<T> {
     }
 
     /** Adds an item to the back. */
+    @Override
     public void addLast(T item) {
         if (size == items.length) {
             resize(items.length * 2);
@@ -49,17 +51,14 @@ public class ArrayDeque<T> implements Iterable<T> {
         size++;
     }
 
-    /** Returns true if empty. */
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
     /** Returns number of elements. */
+    @Override
     public int size() {
         return size;
     }
 
     /** Prints deque from first to last. */
+    @Override
     public void printDeque() {
         for (int i = 0; i < size; i++) {
             System.out.print(get(i) + " ");
@@ -68,6 +67,7 @@ public class ArrayDeque<T> implements Iterable<T> {
     }
 
     /** Removes and returns first item, or null if empty. */
+    @Override
     public T removeFirst() {
         if (isEmpty()) {
             return null;
@@ -82,6 +82,7 @@ public class ArrayDeque<T> implements Iterable<T> {
     }
 
     /** Removes and returns last item, or null if empty. */
+    @Override
     public T removeLast() {
         if (isEmpty()) {
             return null;
@@ -96,6 +97,7 @@ public class ArrayDeque<T> implements Iterable<T> {
     }
 
     /** Gets item at index, or null if invalid. */
+    @Override
     public T get(int index) {
         if (index < 0 || index >= size) {
             return null;
