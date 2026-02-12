@@ -80,6 +80,20 @@ public class ArrayDequeTest {
     }
 
     @Test
+    public void testCrossImplementationEquals() {
+        ArrayDeque<Integer> arrayDeque = new ArrayDeque<>();
+        LinkedListDeque<Integer> linkedDeque = new LinkedListDeque<>();
+
+        for (int i = 0; i < 10; i++) {
+            arrayDeque.addLast(i);
+            linkedDeque.addLast(i);
+        }
+
+        assertTrue(arrayDeque.equals(linkedDeque));
+        assertTrue(linkedDeque.equals(arrayDeque));
+    }
+
+    @Test
     public void testGetEdgeCases() {
         ArrayDeque<Integer> deque = new ArrayDeque<>();
 
