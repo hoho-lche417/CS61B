@@ -158,12 +158,13 @@ public class Commit implements Serializable {
     }
 
     public static void main(String[] args) {
-        File inFile = join(Repository.COMMIT_DIR, "1d", "d9216981378acd79480ca2135cf5cf18e484cc");
+        File inFile = join(Repository.COMMIT_DIR, "81910db269b64314ce663b6a34a388b0123b4035");
         System.out.println(inFile);
         if (inFile.exists()) {
             //Commit c = readObject(inFile, Commit.class);
-            Commit c = Commit.getCommitFromHash("1dd9216981378acd79480ca2135cf5cf18e484cc");
+            Commit c = Commit.getCommitFromHash("81910db269b64314ce663b6a34a388b0123b4035");
             c.printCommit();
+            c.debugPrint();
         }
 
         return;

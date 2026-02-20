@@ -2,7 +2,10 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static gitlet.Utils.*;
 
@@ -162,14 +165,34 @@ public class Repository {
     }
 
     public static void log() {
-        load();
-        String ptrCommit = head;
+        String ptrCommit;
         Commit c;
+
+        load();
+
+        ptrCommit = head;
         while (ptrCommit != null) {
             c = Commit.getCommitFromHash(ptrCommit);
             c.printCommit();
             System.out.println();
             ptrCommit = c.getParentHash();
+        }
+
+        // no need to record()
+    }
+
+    public static void global_log() {
+        String [] fileList;
+
+        load();
+
+        // TO DO: review after getting clear about the order and branches
+        fileList = Repository.COMMIT_DIR.list();
+        Arrays.sort(fileList);
+
+        for (String hash : fileList) {
+            Commit.getCommitFromHash(hash).printCommit();
+            System.out.println();
         }
 
         // no need to record()

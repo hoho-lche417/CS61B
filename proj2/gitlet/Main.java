@@ -35,6 +35,10 @@ public class Main {
                 validateNumArgs(args, 1);
                 Repository.log();
                 break;
+            case "global-log":
+                validateNumArgs(args, 1);
+                Repository.global_log();
+                break;
             case "": // what if args is empty?
                 throw new GitletException(
                         String.format("Please enter a command."));

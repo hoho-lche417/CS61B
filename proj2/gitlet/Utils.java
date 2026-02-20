@@ -241,7 +241,7 @@ class Utils {
         return join(dir, hash.substring(0, 2), hash.substring(2));
     }
 
-    static File createFilePathFromHash(File dir, String hash) {
+    static File createFilePathFromHash0(File dir, String hash) {
         File file = join(dir, hash.substring(0, 2));
         if (!file.exists()) {
             file.mkdir();
@@ -256,6 +256,20 @@ class Utils {
         }
         return file;
     }
+
+    static File createFilePathFromHash(File dir, String hash) {
+        File file;
+        file = join(dir, hash);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return file;
+    }
+
 
     static void writeContentsToHash(File dir, String hash, Object... contents) {
         File file = join(dir, hash.substring(0, 2));
