@@ -27,7 +27,10 @@ public class Main {
                 validateNumArgs(args, 2);
                 Repository.commit(args[1]);
                 break;
-
+            case "rm":
+                validateNumArgs(args, 2);
+                Repository.rm(args[1]);
+                break;
             case "": // what if args is empty?
                 throw new GitletException(
                         String.format("Please enter a command."));

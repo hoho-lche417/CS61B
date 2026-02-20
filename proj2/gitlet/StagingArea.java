@@ -90,6 +90,7 @@ public class StagingArea {
             stagedForAddition.put(filename, hash);
         }
 
+        // TO DO: simply logic?
         // if (stagedForAddition.containsKey(filename)) {
         // compare new hash with the old hash
         // if same do nothing
@@ -103,13 +104,27 @@ public class StagingArea {
             // remove old blob
             file = createFilePathFromHash(Repository.BLOB_DIR, oldHash);
             b = readObject(file, Blob.class);
-            if (b.isOrphan()) {
+            if (b.isOrphan()) { // is it necessary for the check?
                 restrictedDelete(file);
             }
         }
 
         //record();
 
+    }
+
+    public static void rm(String filename) {
+        TreeMap<String, String> commitMapping;
+        // unstage the file if it is currently staged for addition
+        stagedForAddition.remove(filename);
+
+        // If the file is tracked in the current commit
+        // stage it for removal and remove the file from the working directory
+        commitMapping = Commit.getCommitFromHash(Repository.head).getMapping();
+        if (commitMapping.containsKey(filename)) {
+            stagedForRemoval.put(filename, commitMapping.get(filename));
+            restrictedDelete(join(Repository.CWD, filename));
+        }
     }
 
     public static void main(String[] args) {

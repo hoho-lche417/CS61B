@@ -1,7 +1,11 @@
 package gitlet;
 
+import java.io.File;
 import java.io.Serializable;
+import java.util.ResourceBundle;
 import java.util.TreeSet;
+
+import static gitlet.Utils.*;
 
 public class Blob implements Serializable {
 
@@ -12,7 +16,7 @@ public class Blob implements Serializable {
     /* the file contents */
     private String contents;
     /* the set of commit hashes that refers to the blob */
-    private TreeSet<Commit> refBy;
+    private TreeSet<String> refBy;
 
     public Blob(String hash, String contents) {
         this.hash = hash;
@@ -31,6 +35,20 @@ public class Blob implements Serializable {
     // check to see if the blob is referenced by any commits
     public boolean isOrphan() {
         return refBy.isEmpty();
+    }
+
+    public static Blob getBlobFromHash(String hash) {
+        File file = createFilePathFromHash(Repository.BLOB_DIR, hash);
+        Blob b = readObject(file, Blob.class);
+        return b;
+    }
+
+    public void addRef(String commitHash) {
+        refBy.add(commitHash);
+    }
+
+    public void removeRef(String commitHash) {
+        refBy.remove(commitHash);
     }
 
     /**

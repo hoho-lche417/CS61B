@@ -75,8 +75,8 @@ public class Repository {
         Date epochDate;
         Commit c;
 
-        // TO DO: uncomment the below statement
-        //validateNewRepo();
+        // TO DO: comment the below statement maybe for temporary convenience
+        validateNewRepo();
         setupPersistence();
 
         // datetime
@@ -128,6 +128,12 @@ public class Repository {
     public static void add(String filename) {
         load();
         StagingArea.add(filename);
+        record();
+    }
+
+    public static void rm(String filename) {
+        load();
+        StagingArea.rm(filename);
         record();
     }
 

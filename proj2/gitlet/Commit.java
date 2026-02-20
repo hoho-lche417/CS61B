@@ -48,17 +48,32 @@ public class Commit implements Serializable {
     public Commit(String message, Date date, String parent) {
         this.message = message;
         this.date = date;
-        this.hash = null;
-        this.parentHash = parent;
-        this.fileMap = new TreeMap<>();
+        hash = null;
+        parentHash = parent;
+        fileMap = new TreeMap<>();
 
         if (parent != null) {
             // inherit from parent's committed snapshot of files by default
-            this.fileMap = getCommitFromHash(parent).getMapping();
+            fileMap = getCommitFromHash(parent).getMapping();
             update();
         }
 
         record();
+
+//        for (Map.Entry<String, String> mapping : fileMap) {
+//            // add commit hash to the blob
+//            Blob.getBlobFromHash(mapping.getValue()).addRef(hash);
+//        }
+
+//        for (Map.Entry<String, String> staged : StagingArea.stagedForRemoval.entrySet()) {
+//            // remove commit hash from the blob
+//            Blob.getBlobFromHash(staged.getValue()).removeRef(staged.getKey());
+//
+//            // TO DO: remove orphaned blobs (uncomment below)
+//            if (Blob.getBlobFromHash(staged.getValue()).isOrphan()) {
+//                restrictedDelete(getFilePathFromHash(Repository.BLOB_DIR, staged.getValue()));
+//            }
+//        }
     }
 
     public String getHash() {
@@ -88,17 +103,14 @@ public class Commit implements Serializable {
 
     private void update() {
         for (Map.Entry<String, String> staged : StagingArea.stagedForAddition.entrySet()) {
-            // track new files based on staged area for adding
-            // update based on staged area for adding
+            // track new files and update files based on staged area for adding
             fileMap.put(staged.getKey(), staged.getValue());
         }
 
-        // TO DO: untrack files based on staged area for removal
-        /** files tracked in the current commit may be untracked in the new commit
-         *  as a result being staged for removal by the rm command
-         */
-
-        return;
+        for (Map.Entry<String, String> staged : StagingArea.stagedForRemoval.entrySet()) {
+            // files tracked in the current commit will be untracked in the new commit
+            fileMap.remove(staged.getKey());
+        }
     }
 
     public static Commit getCommitFromHash(String hash) {
@@ -125,11 +137,11 @@ public class Commit implements Serializable {
     }
 
     public static void main(String[] args) {
-        File inFile = join(Repository.COMMIT_DIR, "2f", "7cc991cd4c764f71d709625f9449200f91e313");
+        File inFile = join(Repository.COMMIT_DIR, "ec", "c39bb997a5bc857ae53d801cd3eb02e197fb38");
         System.out.println(inFile);
         if (inFile.exists()) {
             //Commit c = readObject(inFile, Commit.class);
-            Commit c = Commit.getCommitFromHash("a8ac55b1b14cec8c5b65719b2448cf00ad1664e6");
+            Commit c = Commit.getCommitFromHash("ecc39bb997a5bc857ae53d801cd3eb02e197fb38");
             c.debugPrint();
             System.out.println(c);
         }
