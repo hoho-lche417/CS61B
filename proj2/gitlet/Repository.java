@@ -2,10 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -69,26 +66,20 @@ public class Repository {
         if (!BLOB_DIR.exists()) {
             BLOB_DIR.mkdir();
         }
-
-        StagingArea.load();
     }
 
     public static void init() {
         Date epochDate;
         Commit c;
 
-        // TO DO: comment the below statement maybe for temporary convenience
         validateNewRepo();
         setupPersistence();
+        StagingArea.load();
 
         // datetime
         epochDate = new Date(0L);
 
         c = new Commit("initial commit", epochDate, null);
-
-        // set head pointer
-        //master = c.getHash();
-        //head = c.getHash();
 
         Branches.init(c.getHash());
 
@@ -209,7 +200,43 @@ public class Repository {
 
     public static void branch(String name) {
         load();
-        Branches.branches.put(name, Branches.head);
+        Branches.branch(name);
+        record();
+    }
+
+    public static void checkoutFile(String filename, String commitID) {
+        Commit c;
+        TreeMap<String, String> mapping;
+        String [] fileList;
+        Blob b;
+        File file;
+
+        load();
+
+        if (commitID == null) {
+            c = Commit.getCommitFromHash(Branches.head);
+        } else {
+            // TO DO: make commit ID to six digits only?
+            c = Commit.getCommitFromHash(commitID);
+        }
+
+        mapping = c.getMapping();
+        if (mapping.containsKey(filename)) {
+            // Takes the version of the file in the head commit and puts it in the working directory
+            file = createFilePath(Repository.CWD, filename, false);
+            b = Blob.getBlobFromHash(mapping.get(filename));
+            writeContents(file, b.getContents());
+        } else {
+            throw new GitletException(
+                    String.format("File does not exist in that commit."));
+        }
+
+        record();
+    }
+
+    public static void checkoutBranch(String branch) {
+        load();
+        Branches.checkout(branch);
         record();
     }
 

@@ -59,21 +59,6 @@ public class Commit implements Serializable {
         }
 
         record();
-
-//        for (Map.Entry<String, String> mapping : fileMap) {
-//            // add commit hash to the blob
-//            Blob.getBlobFromHash(mapping.getValue()).addRef(hash);
-//        }
-
-//        for (Map.Entry<String, String> staged : StagingArea.stagedForRemoval.entrySet()) {
-//            // remove commit hash from the blob
-//            Blob.getBlobFromHash(staged.getValue()).removeRef(staged.getKey());
-//
-//            // TO DO: remove orphaned blobs (uncomment below)
-//            if (Blob.getBlobFromHash(staged.getValue()).isOrphan()) {
-//                restrictedDelete(getFilePathFromHash(Repository.BLOB_DIR, staged.getValue()));
-//            }
-//        }
     }
 
     public String getHash() {
@@ -95,7 +80,7 @@ public class Commit implements Serializable {
         if (hash == null) {
             hash = computeHash(this);
         }
-        File outFile = createFilePath(Repository.COMMIT_DIR, hash);
+        File outFile = createFilePath(Repository.COMMIT_DIR, hash, false);
         writeObject(outFile, this);
 
         return;
@@ -114,17 +99,13 @@ public class Commit implements Serializable {
     }
 
     public static Commit getCommitFromHash(String hash) {
-        File inFile = createFilePath(Repository.COMMIT_DIR, hash);
-        if (inFile.exists()) {
+        File inFile = createFilePath(Repository.COMMIT_DIR, hash, true);
+        // bug: create an empty file
+        if (inFile != null) {
             Commit c = readObject(inFile, Commit.class);
             return c;
         }
         return null;
-    }
-
-    public Commit getParent() {
-        // load object based on parentHash
-        return getCommitFromHash(parentHash);
     }
 
     public String getParentHash() {

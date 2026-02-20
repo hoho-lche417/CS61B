@@ -51,7 +51,8 @@ public class Main {
                 validateNumArgs(args, 1);
                 Repository.status();
                 break;
-            case "checkout": // TO DO
+            case "checkout":
+                checkoutHandler(args);
                 break;
             case "": // what if args is empty?
                 throw new GitletException(
@@ -69,6 +70,20 @@ public class Main {
     private static void validateNumArgs(String[] args, int n) {
         if (args.length != n) {
             // System.out.println("Incorrect operands.");
+            throw new GitletException(
+                    String.format("Incorrect operands."));
+        }
+    }
+
+    // special case since the arguments are more complex compared to other commands
+    private static void checkoutHandler(String[] args) {
+        if (args.length == 3 && args[1].equals("--")) {
+            Repository.checkoutFile(args[2], null);
+        } else if (args.length == 4 && args[2].equals("--")) {
+            Repository.checkoutFile(args[3], args[1]);
+        } else if (args.length == 2){
+            Repository.checkoutBranch(args[1]);
+        } else {
             throw new GitletException(
                     String.format("Incorrect operands."));
         }

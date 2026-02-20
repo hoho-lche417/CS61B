@@ -37,9 +37,13 @@ public class Blob implements Serializable {
     }
 
     public static Blob getBlobFromHash(String hash) {
-        File file = createFilePath(Repository.BLOB_DIR, hash);
-        Blob b = readObject(file, Blob.class);
-        return b;
+        File file = createFilePath(Repository.BLOB_DIR, hash, true);
+        if (file != null) {
+            Blob b = readObject(file, Blob.class);
+            return b;
+        } else {
+            return null;
+        }
     }
 
     public void addRef(String commitHash) {

@@ -257,18 +257,22 @@ class Utils {
         return file;
     }
 
-    static File createFilePath(File dir, String filename) {
+    static File createFilePath(File dir, String filename, boolean restrict) {
         File file = join(dir, filename);
-        if (!file.exists()) {
+        if (file.exists()) {
+            return file;
+        }
+        if (!restrict) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            return file;
+        } else {
+            return null;
         }
-        return file;
     }
-
 
     static void writeContentsToHash(File dir, String hash, Object... contents) {
         File file = join(dir, hash.substring(0, 2));

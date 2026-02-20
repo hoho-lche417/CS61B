@@ -36,23 +36,9 @@ public class StagingArea {
     }
 
     public static void record() {
-        File file = join(Repository.REF_DIR, "staged_add");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        File file = createFilePath(Repository.REF_DIR, "staged_add", false);
         writeObject(file, stagedForAddition);
-        file = join(Repository.REF_DIR, "staged_rm");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        file = createFilePath(Repository.REF_DIR, "staged_rm", false);
         writeObject(file, stagedForRemoval);
     }
 
@@ -83,7 +69,7 @@ public class StagingArea {
 
         if (!stagedForAddition.containsKey(filename)) {
             // create blob from the filename
-            file = createFilePath(Repository.BLOB_DIR, hash);
+            file = createFilePath(Repository.BLOB_DIR, hash, false);
             b = new Blob(hash, contents);
             writeObject(file, b);
             // add a new mapping from filename to hash
@@ -97,12 +83,12 @@ public class StagingArea {
         // if different, overwrite old blob, update the mapping
         oldHash = stagedForAddition.get(filename);
         if (!oldHash.equals(hash)) {
-            file = createFilePath(Repository.BLOB_DIR, hash);
+            file = createFilePath(Repository.BLOB_DIR, hash, false);
             b = new Blob(hash, contents);
             writeObject(file, b);
             stagedForAddition.put(filename, hash);
             // remove old blob
-            file = createFilePath(Repository.BLOB_DIR, oldHash);
+            file = createFilePath(Repository.BLOB_DIR, oldHash, false);
             b = readObject(file, Blob.class);
             if (b.isOrphan()) { // is it necessary for the check?
                 restrictedDelete(file);
