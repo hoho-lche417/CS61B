@@ -12,26 +12,28 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
-        String firstArg = args[0];
+        String firstArg = args[0]; // assume that the cmd is always provided?
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
-                Repository.init();
                 validateNumArgs(args, 1);
+                Repository.init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                //In gitlet, only one file may be added at a time.
                 validateNumArgs(args, 2);
+                Repository.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
-
+            case "commit":
+                validateNumArgs(args, 2);
+                Repository.commit(args[1]);
+                break;
 
             case "": // what if args is empty?
-                System.out.println("Please enter a command.");
-                break;
+                throw new GitletException(
+                        String.format("Please enter a command."));
             default:
-                System.out.println("No command with that name exists.");
-                break;
+                throw new GitletException(
+                        String.format("No command with that name exists."));
         }
     }
 
@@ -42,7 +44,7 @@ public class Main {
     private static void validateNumArgs(String[] args, int n) {
         if (args.length != n) {
             // System.out.println("Incorrect operands.");
-            throw new RuntimeException(
+            throw new GitletException(
                     String.format("Incorrect operands."));
         }
     }

@@ -1,11 +1,10 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Date;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static gitlet.Utils.*;
@@ -14,12 +13,10 @@ import static gitlet.Utils.*;
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Peter
  */
 public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
-     *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
@@ -41,8 +38,6 @@ public class Commit implements Serializable {
      * always have the same order compared to HashMap */
     private TreeMap<String, String> fileMap;
 
-    /* TODO: fill in the rest of this class. */
-
 
     /* FUCNTIONS */
     public Commit() {
@@ -55,7 +50,15 @@ public class Commit implements Serializable {
         this.date = date;
         this.hash = null;
         this.parentHash = parent;
-        this.fileMap = null;
+        this.fileMap = new TreeMap<>();
+
+        if (parent != null) {
+            // inherit from parent's committed snapshot of files by default
+            this.fileMap = getCommitFromHash(parent).getMapping();
+            update();
+        }
+
+        record();
     }
 
     public String getHash() {
@@ -65,52 +68,72 @@ public class Commit implements Serializable {
         return hash;
     }
 
+    public TreeMap<String, String> getMapping() {
+        return fileMap;
+    }
+
     public String computeHash(Commit c) {
         return sha1(serialize(this));
     }
 
-    public void writeToFile() {
+    private void record() {
         if (hash == null) {
             hash = computeHash(this);
         }
-        String folderName = hash.substring(0, 2);
-        String fileName = hash.substring(2);
-        File outFile = join(Repository.COMMIT_FOLDER, folderName);
-
-        outFile.mkdir();
-        outFile = join(outFile, fileName);
-
-        if (!outFile.exists()) {
-            try {
-                outFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+        File outFile = createFilePathFromHash(Repository.COMMIT_DIR, hash);
         writeObject(outFile, this);
 
         return;
     }
 
-    public void readFromFile() {
+    private void update() {
+        for (Map.Entry<String, String> staged : StagingArea.stagedForAddition.entrySet()) {
+            // track new files based on staged area for adding
+            // update based on staged area for adding
+            fileMap.put(staged.getKey(), staged.getValue());
+        }
+
+        // TO DO: untrack files based on staged area for removal
+        /** files tracked in the current commit may be untracked in the new commit
+         *  as a result being staged for removal by the rm command
+         */
 
         return;
     }
 
+    public static Commit getCommitFromHash(String hash) {
+        File inFile = createFilePathFromHash(Repository.COMMIT_DIR, hash);
+        if (inFile.exists()) {
+            Commit c = readObject(inFile, Commit.class);
+            return c;
+        }
+        return null;
+    }
+
     public Commit getParent() {
         // load object based on parentHash
-        return new Commit();
+        return getCommitFromHash(parentHash);
+    }
+
+    // for debug only
+    private void debugPrint() {
+        System.out.println(this.message);
+        System.out.println(this.date);
+        System.out.println(this.hash);
+        System.out.println(this.parentHash);
+        System.out.println(this.fileMap);
     }
 
     public static void main(String[] args) {
-        File inFile = join(Repository.GITLET_DIR, "d1", "1830f1ddeff0950ab03ca22aa8c6d6436bce49");
+        File inFile = join(Repository.COMMIT_DIR, "2f", "7cc991cd4c764f71d709625f9449200f91e313");
         System.out.println(inFile);
         if (inFile.exists()) {
-            Commit c = readObject(inFile, Commit.class);
-            System.out.println(c.message);
-            System.out.println(c.date);
+            //Commit c = readObject(inFile, Commit.class);
+            Commit c = Commit.getCommitFromHash("a8ac55b1b14cec8c5b65719b2448cf00ad1664e6");
+            c.debugPrint();
+            System.out.println(c);
         }
+
         return;
     }
 

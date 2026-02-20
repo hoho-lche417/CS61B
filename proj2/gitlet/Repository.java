@@ -6,18 +6,14 @@ import java.util.Date;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author Peter
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
-     *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
@@ -31,18 +27,18 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /** Folder that commit files live in. */
-    public static final File COMMIT_FOLDER = join(GITLET_DIR, "commits");
+    public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
 
     /** Folder that references live in. */
-    public static final File REF_FOLDER = join(GITLET_DIR, "refs");
+    public static final File REF_DIR = join(GITLET_DIR, "refs");
 
     /** Folder that blobs live in. */
-    public static final File BLOB_FOLDER = join(GITLET_DIR, "blobs");
+    public static final File BLOB_DIR = join(GITLET_DIR, "blobs");
+
+    public static final File STAGED_DIR = join(GITLET_DIR, "stage");
 
     public static String master;
     public static String head;
-
-    /* TODO: fill in the rest of this class. */
 
     /* FUNCTIONS */
 
@@ -60,55 +56,110 @@ public class Repository {
             GITLET_DIR.mkdir();
         }
         // create other folders
-        if (!COMMIT_FOLDER.exists()) {
-            COMMIT_FOLDER.mkdir();
+        if (!COMMIT_DIR.exists()) {
+            COMMIT_DIR.mkdir();
         }
         // ref folders include information about head, master, etc.
-        if (!REF_FOLDER.exists()) {
-            REF_FOLDER.mkdir();
+        if (!REF_DIR.exists()) {
+            REF_DIR.mkdir();
         }
 
-        if (!BLOB_FOLDER.exists()) {
-            BLOB_FOLDER.mkdir();
+        if (!BLOB_DIR.exists()) {
+            BLOB_DIR.mkdir();
         }
 
-
+        StagingArea.load();
     }
 
     public static void init() {
         Date epochDate;
         Commit c;
-        File inFile;
 
-        validateNewRepo();
-        Repository.setupPersistence();
+        // TO DO: uncomment the below statement
+        //validateNewRepo();
+        setupPersistence();
 
         // datetime
         epochDate = new Date(0L);
 
         c = new Commit("initial commit", epochDate, null);
-        c.writeToFile();
 
         // set head pointer
         master = c.getHash(); // how to deal with master and other potential branches?
         head = c.getHash();
 
-        inFile = join(REF_FOLDER, "head");
-        if (!inFile.exists()) {
+        record();
+    }
+
+    private static void load() {
+        File file;
+
+        /** If a user inputs a command that requires being in an initialized Gitlet working
+         * directory (i.e., one containing a .gitlet subdirectory), but is not in such a directory,
+         * print the message Not in an initialized Gitlet directory.
+         */
+        if (!GITLET_DIR.exists()) {
+            //
+            throw new GitletException(
+                    String.format("Not in an initialized Gitlet directory."));
+        }
+
+        file = join(REF_DIR, "head");
+        head = readContentsAsString(file);
+
+        StagingArea.load();
+    }
+
+    private static void record() {
+        File file;
+        file = join(REF_DIR, "head");
+        if (!file.exists()) {
             try {
-                inFile.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        writeContents(inFile, head);
+        writeContents(file, head);
+
+        StagingArea.record();
+    }
+
+    public static void add(String filename) {
+        load();
+        StagingArea.add(filename);
+        record();
+    }
+
+    public static void commit(String msg) {
+        Date now = new Date();
+        Commit c;
+
+        load();
+        if (StagingArea.stagedForAddition.isEmpty() && StagingArea.stagedForRemoval.isEmpty()) {
+            throw new GitletException(
+                    String.format("No changes added to the commit."));
+        }
+
+        if (msg == null || msg.equals("")) {
+            throw new GitletException(
+                    String.format("Please enter a commit message."));
+        }
+
+        c = new Commit(msg, now, head);
+
+        // set head pointer
+        head = c.getHash();
+
+        StagingArea.clear();
+        record();
     }
 
     private static void validateNewRepo() {
         // System.exit(0);
         if (GITLET_DIR.exists()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
-            System.exit(0);
+            throw new GitletException(
+                    String.format("A Gitlet version-control system already exists in the current directory."));
         }
         return;
     }
