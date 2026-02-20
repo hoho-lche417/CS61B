@@ -58,6 +58,23 @@ public class Branches {
         Branches.branches.put(name, Branches.head);
     }
 
+    /** only means to delete the pointer associated with the branch
+     *  does not mean to delete all commits that were created under the branch, or anything like that.
+     */
+    public static void rm_branch(String name) {
+        if (!branches.containsKey(name)) {
+            throw new GitletException(
+                    String.format("A branch with that name does not exist."));
+        }
+
+        if (current.equals(name)) {
+            throw new GitletException(
+                    String.format("Cannot remove the current branch."));
+        }
+        
+        branches.remove(name);
+    }
+
     public static void checkout(String branch) {
         Commit c;
         Blob b;

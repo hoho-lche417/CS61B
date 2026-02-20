@@ -204,6 +204,12 @@ public class Repository {
         record();
     }
 
+    public static void rm_branch(String name) {
+        load();
+        Branches.rm_branch(name);
+        record();
+    }
+
     public static void checkoutFile(String filename, String commitID) {
         Commit c;
         TreeMap<String, String> mapping;
