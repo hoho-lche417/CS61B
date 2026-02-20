@@ -40,8 +40,7 @@ public class Repository {
 
     public static final File STAGED_DIR = join(GITLET_DIR, "stage");
 
-    public static String master;
-    public static String head;
+    //public static String head;
 
     /* FUNCTIONS */
 
@@ -88,15 +87,15 @@ public class Repository {
         c = new Commit("initial commit", epochDate, null);
 
         // set head pointer
-        master = c.getHash(); // how to deal with master and other potential branches?
-        head = c.getHash();
+        //master = c.getHash();
+        //head = c.getHash();
+
+        Branches.init(c.getHash());
 
         record();
     }
 
     private static void load() {
-        File file;
-
         /** If a user inputs a command that requires being in an initialized Gitlet working
          * directory (i.e., one containing a .gitlet subdirectory), but is not in such a directory,
          * print the message Not in an initialized Gitlet directory.
@@ -107,24 +106,24 @@ public class Repository {
                     String.format("Not in an initialized Gitlet directory."));
         }
 
-        file = join(REF_DIR, "head");
-        head = readContentsAsString(file);
-
+//        file = join(REF_DIR, "head");
+//        head = readContentsAsString(file);
+        Branches.load();
         StagingArea.load();
     }
 
     private static void record() {
-        File file;
-        file = join(REF_DIR, "head");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        writeContents(file, head);
-
+//        File file;
+//        file = join(REF_DIR, "head");
+//        if (!file.exists()) {
+//            try {
+//                file.createNewFile();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        writeContents(file, head);
+        Branches.record();
         StagingArea.record();
     }
 
@@ -155,10 +154,11 @@ public class Repository {
                     String.format("Please enter a commit message."));
         }
 
-        c = new Commit(msg, now, head);
+        c = new Commit(msg, now, Branches.head);
 
         // set head pointer
-        head = c.getHash();
+        Branches.updateHead(c.getHash());
+        //head = c.getHash();
 
         StagingArea.clear();
         record();
@@ -170,7 +170,7 @@ public class Repository {
 
         load();
 
-        ptrCommit = head;
+        ptrCommit = Branches.head;
         while (ptrCommit != null) {
             c = Commit.getCommitFromHash(ptrCommit);
             c.printCommit();
@@ -217,6 +217,10 @@ public class Repository {
         }
 
         // no need to record()
+    }
+
+    public static void branch(String name) {
+        //
     }
 
     private static void validateNewRepo() {

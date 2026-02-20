@@ -257,9 +257,8 @@ class Utils {
         return file;
     }
 
-    static File createFilePathFromHash(File dir, String hash) {
-        File file;
-        file = join(dir, hash);
+    static File createFilePath(File dir, String filename) {
+        File file = join(dir, filename);
         if (!file.exists()) {
             try {
                 file.createNewFile();

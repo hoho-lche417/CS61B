@@ -43,6 +43,15 @@ public class Main {
                 validateNumArgs(args, 2);
                 Repository.find(args[1]);
                 break;
+            case "branch":
+                validateNumArgs(args, 2);
+                Repository.branch(args[1]);
+                break;
+            case "status": // TO DO
+                validateNumArgs(args, 1);
+                break;
+            case "checkout": // TO DO
+                break;
             case "": // what if args is empty?
                 throw new GitletException(
                         String.format("Please enter a command."));
@@ -62,16 +71,6 @@ public class Main {
             throw new GitletException(
                     String.format("Incorrect operands."));
         }
-    }
-
-    /** If a user inputs a command that requires being in an initialized Gitlet working
-     * directory (i.e., one containing a .gitlet subdirectory), but is not in such a directory,
-     * print the message Not in an initialized Gitlet directory.
-     */
-    private static void validateInitialised() {
-        // System.exit(0);
-
-        return;
     }
 
 }

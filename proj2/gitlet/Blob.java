@@ -2,7 +2,6 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ResourceBundle;
 import java.util.TreeSet;
 
 import static gitlet.Utils.*;
@@ -38,7 +37,7 @@ public class Blob implements Serializable {
     }
 
     public static Blob getBlobFromHash(String hash) {
-        File file = createFilePathFromHash(Repository.BLOB_DIR, hash);
+        File file = createFilePath(Repository.BLOB_DIR, hash);
         Blob b = readObject(file, Blob.class);
         return b;
     }

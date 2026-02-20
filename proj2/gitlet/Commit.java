@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -96,7 +95,7 @@ public class Commit implements Serializable {
         if (hash == null) {
             hash = computeHash(this);
         }
-        File outFile = createFilePathFromHash(Repository.COMMIT_DIR, hash);
+        File outFile = createFilePath(Repository.COMMIT_DIR, hash);
         writeObject(outFile, this);
 
         return;
@@ -115,7 +114,7 @@ public class Commit implements Serializable {
     }
 
     public static Commit getCommitFromHash(String hash) {
-        File inFile = createFilePathFromHash(Repository.COMMIT_DIR, hash);
+        File inFile = createFilePath(Repository.COMMIT_DIR, hash);
         if (inFile.exists()) {
             Commit c = readObject(inFile, Commit.class);
             return c;

@@ -75,7 +75,7 @@ public class StagingArea {
         stagedForRemoval.remove(filename);
 
         // if same as current commit, remove mapping
-        c = Commit.getCommitFromHash(Repository.head);
+        c = Commit.getCommitFromHash(Branches.head);
         commitedFileHash = c.getMapping().get(filename);
         if (commitedFileHash != null && commitedFileHash.equals(hash)) {
             stagedForAddition.remove(filename);
@@ -83,7 +83,7 @@ public class StagingArea {
 
         if (!stagedForAddition.containsKey(filename)) {
             // create blob from the filename
-            file = createFilePathFromHash(Repository.BLOB_DIR, hash);
+            file = createFilePath(Repository.BLOB_DIR, hash);
             b = new Blob(hash, contents);
             writeObject(file, b);
             // add a new mapping from filename to hash
@@ -97,12 +97,12 @@ public class StagingArea {
         // if different, overwrite old blob, update the mapping
         oldHash = stagedForAddition.get(filename);
         if (!oldHash.equals(hash)) {
-            file = createFilePathFromHash(Repository.BLOB_DIR, hash);
+            file = createFilePath(Repository.BLOB_DIR, hash);
             b = new Blob(hash, contents);
             writeObject(file, b);
             stagedForAddition.put(filename, hash);
             // remove old blob
-            file = createFilePathFromHash(Repository.BLOB_DIR, oldHash);
+            file = createFilePath(Repository.BLOB_DIR, oldHash);
             b = readObject(file, Blob.class);
             if (b.isOrphan()) { // is it necessary for the check?
                 restrictedDelete(file);
@@ -120,7 +120,7 @@ public class StagingArea {
 
         // If the file is tracked in the current commit
         // stage it for removal and remove the file from the working directory
-        commitMapping = Commit.getCommitFromHash(Repository.head).getMapping();
+        commitMapping = Commit.getCommitFromHash(Branches.head).getMapping();
         if (commitMapping.containsKey(filename)) {
             stagedForRemoval.put(filename, commitMapping.get(filename));
             restrictedDelete(join(Repository.CWD, filename));
