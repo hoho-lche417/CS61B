@@ -132,6 +132,10 @@ public class Commit implements Serializable {
         return parentHash;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public void printCommit() {
         // formatting target example: Thu Nov 9 20:00:05 2017 -0800
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);

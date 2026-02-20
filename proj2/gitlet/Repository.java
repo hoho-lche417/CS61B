@@ -198,6 +198,27 @@ public class Repository {
         // no need to record()
     }
 
+    public static void find(String msg) {
+        String [] fileList;
+        Commit c;
+
+        load();
+
+        // TO DO: review after getting clear about the order and branches
+        fileList = Repository.COMMIT_DIR.list();
+        Arrays.sort(fileList);
+
+        for (String hash : fileList) {
+            c = Commit.getCommitFromHash(hash);
+            if (c.getMessage().equals(msg)) {
+                c.printCommit();
+                System.out.println();
+            }
+        }
+
+        // no need to record()
+    }
+
     private static void validateNewRepo() {
         // System.exit(0);
         if (GITLET_DIR.exists()) {
