@@ -47,8 +47,9 @@ public class Main {
                 validateNumArgs(args, 2);
                 Repository.branch(args[1]);
                 break;
-            case "status": // TO DO
+            case "status":
                 validateNumArgs(args, 1);
+                Repository.status();
                 break;
             case "checkout": // TO DO
                 break;

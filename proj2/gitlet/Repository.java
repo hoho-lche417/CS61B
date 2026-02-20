@@ -106,23 +106,11 @@ public class Repository {
                     String.format("Not in an initialized Gitlet directory."));
         }
 
-//        file = join(REF_DIR, "head");
-//        head = readContentsAsString(file);
         Branches.load();
         StagingArea.load();
     }
 
     private static void record() {
-//        File file;
-//        file = join(REF_DIR, "head");
-//        if (!file.exists()) {
-//            try {
-//                file.createNewFile();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        writeContents(file, head);
         Branches.record();
         StagingArea.record();
     }
@@ -220,7 +208,35 @@ public class Repository {
     }
 
     public static void branch(String name) {
-        //
+        load();
+        Branches.branches.put(name, Branches.head);
+        record();
+    }
+
+    public static void status() {
+        load();
+
+        System.out.println("=== Branches ===");
+        for (String branch : Branches.branches.keySet()) {
+            System.out.println(((Branches.current.equals(branch)) ? "*" : "") + branch);
+        }
+        System.out.println();
+
+        System.out.println("=== Staged Files ===");
+        for (String staged : StagingArea.stagedForAddition.keySet()) {
+            System.out.println(staged);
+        }
+        System.out.println();
+
+        System.out.println("=== Removed Files ===");
+        for (String staged : StagingArea.stagedForRemoval.keySet()) {
+            System.out.println(staged);
+        }
+        System.out.println();
+
+        // TO DO: extra credits
+
+        // no need to record()
     }
 
     private static void validateNewRepo() {
