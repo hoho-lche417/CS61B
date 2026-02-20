@@ -3,9 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -33,6 +32,7 @@ public class Commit implements Serializable {
 
     /** The hash value of the parent commit */
     private String parentHash;
+    private String parentHash2; // for merging only
 
     /** a map from filenames to hash strings
      * always have the same order compared to HashMap */
@@ -50,6 +50,7 @@ public class Commit implements Serializable {
         this.date = date;
         hash = null;
         parentHash = parent;
+        parentHash2 = null;
         fileMap = new TreeMap<>();
 
         if (parent != null) {
@@ -127,6 +128,26 @@ public class Commit implements Serializable {
         return getCommitFromHash(parentHash);
     }
 
+    public String getParentHash() {
+        return parentHash;
+    }
+
+    public void printCommit() {
+        // formatting target example: Thu Nov 9 20:00:05 2017 -0800
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+
+        System.out.println("===");
+        System.out.println("commit " + hash);
+
+        // TO DO: need to double check after implementing merge
+        if (parentHash2 != null) {
+            System.out.println("Merge: " + parentHash.substring(0, 7) + " " + parentHash2.substring(0, 7));
+        }
+
+        System.out.println("Date: " + sdf.format(date));
+        System.out.println(message);
+    }
+
     // for debug only
     private void debugPrint() {
         System.out.println(this.message);
@@ -137,13 +158,12 @@ public class Commit implements Serializable {
     }
 
     public static void main(String[] args) {
-        File inFile = join(Repository.COMMIT_DIR, "ec", "c39bb997a5bc857ae53d801cd3eb02e197fb38");
+        File inFile = join(Repository.COMMIT_DIR, "1d", "d9216981378acd79480ca2135cf5cf18e484cc");
         System.out.println(inFile);
         if (inFile.exists()) {
             //Commit c = readObject(inFile, Commit.class);
-            Commit c = Commit.getCommitFromHash("ecc39bb997a5bc857ae53d801cd3eb02e197fb38");
-            c.debugPrint();
-            System.out.println(c);
+            Commit c = Commit.getCommitFromHash("1dd9216981378acd79480ca2135cf5cf18e484cc");
+            c.printCommit();
         }
 
         return;

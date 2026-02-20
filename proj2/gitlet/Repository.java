@@ -161,6 +161,20 @@ public class Repository {
         record();
     }
 
+    public static void log() {
+        load();
+        String ptrCommit = head;
+        Commit c;
+        while (ptrCommit != null) {
+            c = Commit.getCommitFromHash(ptrCommit);
+            c.printCommit();
+            System.out.println();
+            ptrCommit = c.getParentHash();
+        }
+
+        // no need to record()
+    }
+
     private static void validateNewRepo() {
         // System.exit(0);
         if (GITLET_DIR.exists()) {
