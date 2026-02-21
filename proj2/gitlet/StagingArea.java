@@ -51,8 +51,7 @@ public class StagingArea {
         List<String> filenameList = plainFilenamesIn(Repository.CWD);
 
         if (!filenameList.contains(filename)) {
-            throw new GitletException(
-                    String.format("File does not exist."));
+            errorHandler("File does not exist.", true);
         }
 
         String contents = readContentsAsString(join(Repository.CWD, filename));

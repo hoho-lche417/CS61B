@@ -1,6 +1,6 @@
 package gitlet;
 
-import static gitlet.Repository.GITLET_DIR;
+import static gitlet.Utils.*;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author Hoho
@@ -66,11 +66,9 @@ public class Main {
                 Repository.merge(args[1]);
                 break;
             case "": // what if args is empty?
-                throw new GitletException(
-                        String.format("Please enter a command."));
+                errorHandler("Please enter a command.", true);
             default:
-                throw new GitletException(
-                        String.format("No command with that name exists."));
+                errorHandler("No command with that name exists.", true);
         }
     }
 
@@ -80,9 +78,7 @@ public class Main {
      */
     private static void validateNumArgs(String[] args, int n) {
         if (args.length != n) {
-            // System.out.println("Incorrect operands.");
-            throw new GitletException(
-                    String.format("Incorrect operands."));
+            errorHandler("Incorrect operands.", true);
         }
     }
 
@@ -95,8 +91,7 @@ public class Main {
         } else if (args.length == 2){
             Repository.checkoutBranch(args[1]);
         } else {
-            throw new GitletException(
-                    String.format("Incorrect operands."));
+            errorHandler("Incorrect operands.", true);
         }
     }
 

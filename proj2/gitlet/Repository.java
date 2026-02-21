@@ -85,7 +85,6 @@ public class Repository {
          * print the message Not in an initialized Gitlet directory.
          */
         if (!GITLET_DIR.exists()) {
-            //
             errorHandler("Not in an initialized Gitlet directory.", true);
         }
 
@@ -121,13 +120,11 @@ public class Repository {
 
         load();
         if (StagingArea.stagedForAddition.isEmpty() && StagingArea.stagedForRemoval.isEmpty()) {
-            throw new GitletException(
-                    String.format("No changes added to the commit."));
+            errorHandler("No changes added to the commit.", true);
         }
 
         if (msg == null || msg.equals("")) {
-            throw new GitletException(
-                    String.format("Please enter a commit message."));
+            errorHandler("Please enter a commit message.", true);
         }
 
         c = new Commit(msg, now, Branches.head, mergeID);
@@ -227,8 +224,7 @@ public class Repository {
             b = Blob.getBlobFromHash(mapping.get(filename));
             writeContents(file, b.getContents());
         } else {
-            throw new GitletException(
-                    String.format("File does not exist in that commit."));
+            errorHandler("File does not exist in that commit.", true);
         }
 
         record();
@@ -283,7 +279,6 @@ public class Repository {
     }
 
     private static void validateNewRepo() {
-        // System.exit(0);
         if (GITLET_DIR.exists()) {
             errorHandler("A Gitlet version-control system already exists in the current directory.", true);
         }

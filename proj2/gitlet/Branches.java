@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import static gitlet.Utils.*;
+import static gitlet.Utils.errorHandler;
 
 /** Represents the branch mechanism
  *  essentially, it should be part of the repository class,
@@ -59,13 +60,11 @@ public class Branches {
      */
     public static void rm_branch(String name) {
         if (!branches.containsKey(name)) {
-            throw new GitletException(
-                    String.format("A branch with that name does not exist."));
+            errorHandler("A branch with that name does not exist.", true);
         }
 
         if (current.equals(name)) {
-            throw new GitletException(
-                    String.format("Cannot remove the current branch."));
+            errorHandler("Cannot remove the current branch.", true);
         }
 
         branches.remove(name);
@@ -77,13 +76,11 @@ public class Branches {
     public static void checkout(String branch) {
 
         if (!branches.keySet().contains(branch)) {
-            throw new GitletException(
-                    String.format("No such branch exists."));
+            errorHandler("No such branch exists.", true);
         }
 
         if (current.equals(branch)) {
-            throw new GitletException(
-                    String.format("No need to checkout the current branch."));
+            errorHandler("No need to checkout the current branch.", true);
         }
 
         // if a working file is untracked and would be overwritten
@@ -111,8 +108,8 @@ public class Branches {
 
         for (String filename : fileList) {
             if (!mappingCurrent.containsKey(filename) && mappingCheckout.containsKey(filename)) {
-                throw new GitletException(
-                        String.format("There is an untracked file in the way; delete it, or add and commit it first."));
+                errorHandler("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.", true);
             }
         }
     }
@@ -175,18 +172,15 @@ public class Branches {
         splitHash = findSplitNode(branchHash, head);
 
         if (!StagingArea.stagedForAddition.isEmpty() || !StagingArea.stagedForRemoval.isEmpty()) {
-            throw new GitletException(
-                    String.format("You have uncommitted changes."));
+            errorHandler("You have uncommitted changes.", true);
         }
 
         if (!branches.containsKey(branch)) {
-            throw new GitletException(
-                    String.format("A branch with that name does not exist."));
+            errorHandler("A branch with that name does not exist.", true);
         }
 
         if (branch.equals(current)) {
-            throw new GitletException(
-                    String.format("Cannot merge a branch with itself."));
+            errorHandler("Cannot merge a branch with itself.", true);
         }
 
         // if split node is the same as the branch to be merged
