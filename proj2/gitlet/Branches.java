@@ -71,17 +71,11 @@ public class Branches {
             throw new GitletException(
                     String.format("Cannot remove the current branch."));
         }
-        
+
         branches.remove(name);
     }
 
     public static void checkout(String branch) {
-        Commit c;
-        Blob b;
-        TreeMap<String, String> mappingCheckout, mappingCurrent;
-        File file;
-        String str;
-        String [] fileList;
 
         if (!branches.keySet().contains(branch)) {
             throw new GitletException(
@@ -93,9 +87,27 @@ public class Branches {
                     String.format("No need to checkout the current branch."));
         }
 
-        // if a working file is untracked in the current branch and would be overwritten
+        reset(branches.get(branch));
+
+        // set the current branch and update the head
+        current = branch;
+        updateHead(branches.get(current));
+
+        // clear the staging area
+        StagingArea.clear();
+    }
+
+    public static void reset(String commitID) {
+        Commit c;
+        Blob b;
+        TreeMap<String, String> mappingCheckout, mappingCurrent;
+        File file;
+        String str;
+        String [] fileList;
+
+        // if a working file is untracked and would be overwritten
         fileList = Repository.CWD.list();
-        mappingCheckout = Commit.getCommitFromHash(branches.get(branch)).getMapping();
+        mappingCheckout = Commit.getCommitFromHash(commitID).getMapping();
         mappingCurrent = Commit.getCommitFromHash(head).getMapping();
 
         for (String filename : fileList) {
@@ -105,25 +117,24 @@ public class Branches {
             }
         }
 
-        // checkout all the files in the head the new branch with overwriting
+        // checkout all the files from the commit and overwrite
         for (Map.Entry<String, String> entry : mappingCheckout.entrySet()) {
             file = createFilePath(Repository.CWD, entry.getKey(), false);
             str = Blob.getBlobFromHash(entry.getValue()).getContents();
             writeContents(file, str);
         }
 
-        // delete all the tracked files that are not in the new branch
+        // delete all the tracked files not present in the commit
         for (String filename : mappingCurrent.keySet()) {
             if (!mappingCheckout.containsKey(filename)) {
                 restrictedDelete(join(Repository.CWD, filename));
             }
         }
 
-        // set the current branch and update the head
-        current = branch;
-        head = branches.get(current);
+        updateHead(commitID);
 
         // clear the staging area
         StagingArea.clear();
     }
+
 }

@@ -240,9 +240,17 @@ public class Repository {
         record();
     }
 
+    //  no way to be in a detached head state using checkout
     public static void checkoutBranch(String branch) {
         load();
         Branches.checkout(branch);
+        record();
+    }
+
+    // also moves the branch pointer
+    public static void reset(String commitID) {
+        load();
+        Branches.reset(commitID);
         record();
     }
 

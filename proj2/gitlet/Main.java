@@ -58,6 +58,10 @@ public class Main {
             case "checkout":
                 checkoutHandler(args);
                 break;
+            case "reset":
+                validateNumArgs(args, 2);
+                Repository.reset(args[1]);
+                break;
             case "": // what if args is empty?
                 throw new GitletException(
                         String.format("Please enter a command."));
