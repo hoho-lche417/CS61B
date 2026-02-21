@@ -44,12 +44,12 @@ public class Commit implements Serializable {
         // this.date = 0;
     }
 
-    public Commit(String message, Date date, String parent) {
+    public Commit(String message, Date date, String parent, String parent2) {
         this.message = message;
         this.date = date;
         hash = null;
         parentHash = parent;
-        parentHash2 = null;
+        parentHash2 = parent2;
         fileMap = new TreeMap<>();
 
         if (parent != null) {
@@ -98,18 +98,16 @@ public class Commit implements Serializable {
         }
     }
 
-    public static Commit getCommitFromHash(String hash) {
-        File inFile = createFilePath(Repository.COMMIT_DIR, hash, true);
-        // bug: create an empty file
-        if (inFile != null) {
-            Commit c = readObject(inFile, Commit.class);
-            return c;
-        }
-        return null;
-    }
-
     public String getParentHash() {
         return parentHash;
+    }
+
+    public String getParentHash2() {
+        return parentHash2;
+    }
+
+    public void setParentHash2(String hash) {
+        parentHash2 = hash;
     }
 
     public String getMessage() {
@@ -130,6 +128,16 @@ public class Commit implements Serializable {
 
         System.out.println("Date: " + sdf.format(date));
         System.out.println(message);
+    }
+
+    public static Commit getCommitFromHash(String hash) {
+        File inFile = createFilePath(Repository.COMMIT_DIR, hash, true);
+        // bug: create an empty file
+        if (inFile != null) {
+            Commit c = readObject(inFile, Commit.class);
+            return c;
+        }
+        return null;
     }
 
     // for debug only

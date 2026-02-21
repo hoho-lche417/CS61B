@@ -237,26 +237,6 @@ class Utils {
         System.out.println();
     }
 
-    static File getFilePathFromHash(File dir, String hash) {
-        return join(dir, hash.substring(0, 2), hash.substring(2));
-    }
-
-    static File createFilePathFromHash0(File dir, String hash) {
-        File file = join(dir, hash.substring(0, 2));
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        file = join(file, hash.substring(2));
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return file;
-    }
-
     static File createFilePath(File dir, String filename, boolean restrict) {
         File file = join(dir, filename);
         if (file.exists()) {
@@ -272,39 +252,6 @@ class Utils {
         } else {
             return null;
         }
-    }
-
-    static void writeContentsToHash(File dir, String hash, Object... contents) {
-        File file = join(dir, hash.substring(0, 2));
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        file = join(file, hash.substring(2));
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        writeContents(file, contents);
-    }
-
-    static void writeObjectsToHash(File dir, String hash, Serializable obj) {
-        File file = join(dir, hash.substring(0, 2));
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        file = join(file, hash.substring(2));
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        writeObject(file, obj);
-        return;
     }
 
 }

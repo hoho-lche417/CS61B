@@ -55,8 +55,6 @@ public class StagingArea {
         Blob b;
         Commit c;
 
-        //load();
-
         // remove mapping from stagedForRemoval
         stagedForRemoval.remove(filename);
 
@@ -95,8 +93,6 @@ public class StagingArea {
             }
         }
 
-        //record();
-
     }
 
     public static void rm(String filename) {
@@ -120,6 +116,5 @@ public class StagingArea {
             stagedForAddition = (TreeMap<String, String>) readObject(inFile, TreeMap.class);
             System.out.println(stagedForAddition);
         }
-        return;
     }
 }

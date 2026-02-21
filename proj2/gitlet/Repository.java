@@ -79,7 +79,7 @@ public class Repository {
         // datetime
         epochDate = new Date(0L);
 
-        c = new Commit("initial commit", epochDate, null);
+        c = new Commit("initial commit", epochDate, null, null);
 
         Branches.init(c.getHash());
 
@@ -118,7 +118,12 @@ public class Repository {
         record();
     }
 
-    public static void commit(String msg) {
+    /**
+     * make a new commit with the message msg, merging also supported
+     * @param msg the log message for the new commit
+     * @param mergeID provide the second parent hash if it is a merge, else null
+     */
+    public static void commit(String msg, String mergeID) {
         Date now = new Date();
         Commit c;
 
@@ -133,11 +138,10 @@ public class Repository {
                     String.format("Please enter a commit message."));
         }
 
-        c = new Commit(msg, now, Branches.head);
+        c = new Commit(msg, now, Branches.head, mergeID);
 
         // set head pointer
         Branches.updateHead(c.getHash());
-        //head = c.getHash();
 
         StagingArea.clear();
         record();
@@ -278,6 +282,14 @@ public class Repository {
         // TO DO: extra credits
 
         // no need to record()
+    }
+
+    public static void merge(String branch) {
+        load();
+
+        Branches.merge(branch);
+
+        record();
     }
 
     private static void validateNewRepo() {

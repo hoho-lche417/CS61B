@@ -25,7 +25,7 @@ public class Main {
                 break;
             case "commit":
                 validateNumArgs(args, 2);
-                Repository.commit(args[1]);
+                Repository.commit(args[1], null);
                 break;
             case "rm":
                 validateNumArgs(args, 2);
@@ -61,6 +61,10 @@ public class Main {
             case "reset":
                 validateNumArgs(args, 2);
                 Repository.reset(args[1]);
+                break;
+            case "merge":
+                validateNumArgs(args, 2);
+                Repository.merge(args[1]);
                 break;
             case "": // what if args is empty?
                 throw new GitletException(
