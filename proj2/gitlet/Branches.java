@@ -5,6 +5,11 @@ import java.util.*;
 
 import static gitlet.Utils.*;
 
+/** Represents the branch mechanism
+ *  essentially, it should be part of the repository class, but due to the relative size of the logic
+ *  it is separated out as a standalone class
+ *  @author Hoho
+ */
 public class Branches {
 
     // a mapping from branch names to the hashes
@@ -22,27 +27,20 @@ public class Branches {
     }
 
     public static void load() {
-        File file;
-        file = createFilePath(Repository.REF_DIR, "head", false);
-        head = readContentsAsString(file);
+        head = readContentsAsString(createFilePath(Repository.REF_DIR, "head", false));
 
-        file = createFilePath(Repository.REF_DIR, "current", false);
-        current = readContentsAsString(file);
+        current = readContentsAsString(createFilePath(Repository.REF_DIR, "current", false));
 
-        file = createFilePath(Repository.REF_DIR, "branches", false);
-        branches = (TreeMap<String, String>) readObject(file, TreeMap.class);
+        branches = (TreeMap<String, String>) readObject(createFilePath(Repository.REF_DIR,
+                "branches", false), TreeMap.class);
     }
 
     public static void record() {
-        File file;
-        file = createFilePath(Repository.REF_DIR, "head", false);
-        writeContents(file, head);
+        writeContents(createFilePath(Repository.REF_DIR, "head", false), head);
 
-        file = createFilePath(Repository.REF_DIR, "current", false);
-        writeContents(file, current);
+        writeContents(createFilePath(Repository.REF_DIR, "current", false), current);
 
-        file = createFilePath(Repository.REF_DIR, "branches", false);
-        writeObject(file, branches);
+        writeObject(createFilePath(Repository.REF_DIR, "branches", false), branches);
     }
 
     public static void updateHead(String hash) {
@@ -153,7 +151,6 @@ public class Branches {
         checkUntrackedFiles(commitID);
 
         updateCWD(commitID);
-
         updateHead(commitID);
 
         // clear the staging area
@@ -167,12 +164,9 @@ public class Branches {
     public static void merge(String branch) {
         String splitHash, branchHash;
         String oldBranch;
-        String contentCurrent, contentMerge; // for conflict
         String log;
         StringBuilder sb;
         List<String> conflictFiles = new ArrayList<>();
-
-        //Commit split;
 
         TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
 

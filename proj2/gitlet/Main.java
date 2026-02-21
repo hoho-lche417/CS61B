@@ -3,7 +3,7 @@ package gitlet;
 import static gitlet.Repository.GITLET_DIR;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author Hoho
  */
 public class Main {
 
@@ -11,7 +11,6 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        // TODO: what if args is empty?
         String firstArg = args[0]; // assume that the cmd is always provided?
         switch(firstArg) {
             case "init":

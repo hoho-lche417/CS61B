@@ -6,6 +6,9 @@ import java.util.TreeSet;
 
 import static gitlet.Utils.*;
 
+/** Represents the file contents and relevant information  \
+ *  @author Hoho
+ */
 public class Blob implements Serializable {
 
     /** the hash of the file contents (not the blob itself)
@@ -25,10 +28,6 @@ public class Blob implements Serializable {
 
     public String getContents() {
         return contents;
-    }
-
-    public String getHash() {
-        return hash;
     }
 
     // check to see if the blob is referenced by any commits
@@ -54,16 +53,5 @@ public class Blob implements Serializable {
         refBy.remove(commitHash);
     }
 
-    /**
-     * return the file contents as a String from the path indicated by the arguments
-     * @param folderName
-     * @param fileName
-     */
-    public String readFromFile(String folderName, String fileName) {
-        return "";
-    }
 
-    public void writeToFile(String folderName, String fileName, String contents) {
-        return;
-    }
 }

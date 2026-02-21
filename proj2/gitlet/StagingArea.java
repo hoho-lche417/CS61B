@@ -7,6 +7,11 @@ import java.util.TreeMap;
 
 import static gitlet.Utils.*;
 
+/** Represents the staging area mechanism
+ *  essentially, it should be part of the repository class, but due to the relative size of the logic
+ *  it is separated out as a standalone class
+ *  @author Hoho
+ */
 public class StagingArea {
 
     /** a map from filenames to hash strings (representing blobs)
@@ -44,10 +49,12 @@ public class StagingArea {
 
     public static void add(String filename) {
         List<String> filenameList = plainFilenamesIn(Repository.CWD);
+
         if (!filenameList.contains(filename)) {
             throw new GitletException(
                     String.format("File does not exist."));
         }
+
         String contents = readContentsAsString(join(Repository.CWD, filename));
         String hash = sha1(contents);
         String oldHash, commitedFileHash;
@@ -109,12 +116,4 @@ public class StagingArea {
         }
     }
 
-    public static void main(String[] args) {
-        File inFile = join(Repository.REF_DIR, "staged_add");
-        System.out.println(inFile);
-        if (inFile.exists()) {
-            stagedForAddition = (TreeMap<String, String>) readObject(inFile, TreeMap.class);
-            System.out.println(stagedForAddition);
-        }
-    }
 }

@@ -1,16 +1,12 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static gitlet.Utils.*;
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author Peter
+ *  @author Hoho
  */
 public class Repository {
     /**
@@ -35,9 +31,6 @@ public class Repository {
     /** Folder that blobs live in. */
     public static final File BLOB_DIR = join(GITLET_DIR, "blobs");
 
-    public static final File STAGED_DIR = join(GITLET_DIR, "stage");
-
-    //public static String head;
 
     /* FUNCTIONS */
 
@@ -187,7 +180,6 @@ public class Repository {
 
         load();
 
-        // TO DO: review after getting clear about the order and branches
         fileList = Repository.COMMIT_DIR.list();
         Arrays.sort(fileList);
 
@@ -217,7 +209,6 @@ public class Repository {
     public static void checkoutFile(String filename, String commitID) {
         Commit c;
         TreeMap<String, String> mapping;
-        String [] fileList;
         Blob b;
         File file;
 
@@ -226,7 +217,7 @@ public class Repository {
         if (commitID == null) {
             c = Commit.getCommitFromHash(Branches.head);
         } else {
-            // TO DO: make commit ID to six digits only?
+            // maybe make commit ID to six digits only?
             c = Commit.getCommitFromHash(commitID);
         }
 
@@ -298,14 +289,7 @@ public class Repository {
             throw new GitletException(
                     String.format("A Gitlet version-control system already exists in the current directory."));
         }
-        return;
     }
 
-    public static void main(String[] args) {
-        Date epochDate = new Date(0L);
-
-        System.out.println("Epoch Date (default toString format): " + epochDate.toString());
-        // System.out.println(Instant.EPOCH);
-    }
 
 }
