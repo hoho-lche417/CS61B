@@ -266,6 +266,11 @@ public class Repository {
         System.out.println();
 
         // TO DO: extra credits
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println();
+
+        System.out.println("=== Untracked Files ===");
+        System.out.println();
 
         // no need to record()
     }
