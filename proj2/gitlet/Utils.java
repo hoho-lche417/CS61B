@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
-
 /** Assorted utilities.
  *
  * Give this file a good read as it provides several useful utility functions
@@ -251,6 +250,14 @@ class Utils {
             return file;
         } else {
             return null;
+        }
+    }
+
+    static void errorHandler(String msg, boolean abort) {
+        //throw new GitletException(String.format(msg));
+        System.out.println(msg);
+        if (abort) {
+            System.exit(0);
         }
     }
 

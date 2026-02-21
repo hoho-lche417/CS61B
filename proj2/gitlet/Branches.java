@@ -6,7 +6,8 @@ import java.util.*;
 import static gitlet.Utils.*;
 
 /** Represents the branch mechanism
- *  essentially, it should be part of the repository class, but due to the relative size of the logic
+ *  essentially, it should be part of the repository class,
+ *  but due to the relative size of the logic
  *  it is separated out as a standalone class
  *  @author Hoho
  */

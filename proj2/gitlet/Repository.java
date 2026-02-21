@@ -86,8 +86,7 @@ public class Repository {
          */
         if (!GITLET_DIR.exists()) {
             //
-            throw new GitletException(
-                    String.format("Not in an initialized Gitlet directory."));
+            errorHandler("Not in an initialized Gitlet directory.", true);
         }
 
         Branches.load();
@@ -286,8 +285,7 @@ public class Repository {
     private static void validateNewRepo() {
         // System.exit(0);
         if (GITLET_DIR.exists()) {
-            throw new GitletException(
-                    String.format("A Gitlet version-control system already exists in the current directory."));
+            errorHandler("A Gitlet version-control system already exists in the current directory.", true);
         }
     }
 
