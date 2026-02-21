@@ -39,7 +39,7 @@ public class Main {
                 break;
             case "global-log":
                 validateNumArgs(args, 1);
-                Repository.global_log();
+                Repository.globallog();
                 break;
             case "find":
                 validateNumArgs(args, 2);

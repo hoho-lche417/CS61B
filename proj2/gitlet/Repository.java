@@ -153,7 +153,7 @@ public class Repository {
         // no need to record()
     }
 
-    public static void global_log() {
+    public static void globallog() {
         String [] fileList;
 
         load();
@@ -173,6 +173,7 @@ public class Repository {
     public static void find(String msg) {
         String [] fileList;
         Commit c;
+        boolean found = false;
 
         load();
 
@@ -183,8 +184,12 @@ public class Repository {
             c = Commit.getCommitFromHash(hash);
             if (c.getMessage().equals(msg)) {
                 System.out.println(hash);
-                System.out.println();
+                found = true;
             }
+        }
+
+        if (!found) {
+            errorHandler("Found no commit with that message.", false);
         }
 
         // no need to record()
@@ -198,7 +203,7 @@ public class Repository {
 
     public static void rm_branch(String name) {
         load();
-        Branches.rm_branch(name);
+        Branches.rmbranch(name);
         record();
     }
 

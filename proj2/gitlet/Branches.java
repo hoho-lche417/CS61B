@@ -59,9 +59,10 @@ public class Branches {
     }
 
     /** only means to delete the pointer associated with the branch
-     *  does not mean to delete all commits that were created under the branch, or anything like that.
+     *  does not mean to delete all commits that were created under
+     *  the branch or anything like that.
      */
-    public static void rm_branch(String name) {
+    public static void rmbranch(String name) {
         if (!branches.containsKey(name)) {
             errorHandler("A branch with that name does not exist.", true);
         }
@@ -111,8 +112,8 @@ public class Branches {
 
         for (String filename : fileList) {
             if (!mappingCurrent.containsKey(filename) && mappingCheckout.containsKey(filename)) {
-                errorHandler("There is an untracked file in the way; delete it, " +
-                        "or add and commit it first.", true);
+                errorHandler("There is an untracked file in the way; delete it, "
+                        + "or add and commit it first.", true);
             }
         }
     }
@@ -214,13 +215,14 @@ public class Branches {
         for (Map.Entry<String, String> entry : mappingSplit.entrySet()) {
 
             // both branch contains the file
-            if (mappingMerge.containsKey(entry.getKey()) &&
-                    mappingCurrent.containsKey(entry.getKey())) {
+            if (mappingMerge.containsKey(entry.getKey())
+                    && mappingCurrent.containsKey(entry.getKey())) {
 
-                // files modified in the given branch since the split but not modified in the current branch
+                // files modified in the given branch since the split
+                // but not modified in the current branch
                 // should be changed to their versions in the given branch
-                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue()) &&
-                        mappingCurrent.get(entry.getKey()).equals(entry.getValue())) {
+                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
+                        && mappingCurrent.get(entry.getKey()).equals(entry.getValue())) {
                     mappingCurrent.put(entry.getKey(), mappingMerge.get(entry.getKey()));
                     // TO DO: double check does it need to be staged?
                     StagingArea.add(entry.getKey());
@@ -233,23 +235,23 @@ public class Branches {
                 // (i.e., same content or both removed) are left unchanged
 
                 // conflict if contents of both are changed and different from other
-                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue()) &&
-                        !mappingCurrent.get(entry.getKey()).equals(entry.getValue()) &&
-                        !mappingCurrent.get(entry.getKey()).equals(mappingMerge.get(entry.getKey()))) {
+                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
+                        && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
+                        && !mappingCurrent.get(entry.getKey()).equals(mappingMerge.get(entry.getKey()))) {
                     conflictFiles.add(entry.getKey());
                 }
             }
 
             // conflict if contents of one are changed and the other file is deleted
-            if (mappingMerge.containsKey(entry.getKey()) &&
-                    !mappingMerge.get(entry.getKey()).equals(entry.getValue()) &&
-                    !mappingCurrent.containsKey(entry.getKey())) {
+            if (mappingMerge.containsKey(entry.getKey())
+                    && !mappingMerge.get(entry.getKey()).equals(entry.getValue())
+                    && !mappingCurrent.containsKey(entry.getKey())) {
                 conflictFiles.add(entry.getKey());
             }
 
-            if (mappingCurrent.containsKey(entry.getKey()) &&
-                    !mappingCurrent.get(entry.getKey()).equals(entry.getValue()) &&
-                    !mappingMerge.containsKey(entry.getKey())) {
+            if (mappingCurrent.containsKey(entry.getKey())
+                    && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
+                    && !mappingMerge.containsKey(entry.getKey())) {
                 conflictFiles.add(entry.getKey());
             }
 
@@ -258,7 +260,8 @@ public class Branches {
         // files not present at the split point but present only in the given branch
         // should be checked out and staged
         for (String filename : mappingMerge.keySet()) {
-            if (!mappingSplit.containsKey(filename) && !mappingCurrent.containsKey(filename)) {
+            if (!mappingSplit.containsKey(filename)
+                    && !mappingCurrent.containsKey(filename)) {
                 StagingArea.record();
                 Repository.checkoutFile(filename, branchHash);
                 StagingArea.add(filename);
@@ -270,9 +273,9 @@ public class Branches {
 
         // conflict if file absent at the split but has different contents in both branches
         for (Map.Entry<String, String> entry : mappingCurrent.entrySet()) {
-            if (!mappingSplit.containsKey(entry.getKey()) &&
-                    mappingMerge.containsKey(entry.getKey()) &&
-                    !entry.getValue().equals(mappingMerge.get(entry.getKey()))) {
+            if (!mappingSplit.containsKey(entry.getKey())
+                    && mappingMerge.containsKey(entry.getKey())
+                    && !entry.getValue().equals(mappingMerge.get(entry.getKey()))) {
                 conflictFiles.add(entry.getKey());
             }
         }

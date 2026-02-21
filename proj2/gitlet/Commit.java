@@ -129,14 +129,15 @@ public class Commit implements Serializable {
         File inFile;
 
         // handle the case where the input is just the first six digits of the hash
-        if (hash.length() == 6) {
+        if (hash.length() < 40) {
             // find the match from the hashes in the commit dir
             fileList = Repository.COMMIT_DIR.list();
             Arrays.sort(fileList);
 
             for (String h : fileList) {
-                if (h.substring(0, 6).equals(hash)) {
+                if (h.substring(0, hash.length()).equals(hash)) {
                     hash = h;
+                    break; // just find the first match?
                 }
             }
         }

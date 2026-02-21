@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -108,8 +107,8 @@ public class StagingArea {
         commitMapping = Commit.getCommitFromHash(Branches.head).getMapping();
 
         // If the file is neither staged nor tracked by the head commit
-        if (!stagedForAddition.containsKey(filename) &&
-                !commitMapping.containsKey(filename)) {
+        if (!stagedForAddition.containsKey(filename)
+                && !commitMapping.containsKey(filename)) {
             errorHandler("No reason to remove the file", true);
         }
 
