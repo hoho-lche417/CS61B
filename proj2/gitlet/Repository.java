@@ -182,7 +182,7 @@ public class Repository {
         for (String hash : fileList) {
             c = Commit.getCommitFromHash(hash);
             if (c.getMessage().equals(msg)) {
-                c.printCommit();
+                System.out.println(hash);
                 System.out.println();
             }
         }
@@ -215,6 +215,9 @@ public class Repository {
         } else {
             // maybe make commit ID to six digits only?
             c = Commit.getCommitFromHash(commitID);
+            if (c == null) {
+                errorHandler("No commit with that id exists.", true);
+            }
         }
 
         mapping = c.getMapping();

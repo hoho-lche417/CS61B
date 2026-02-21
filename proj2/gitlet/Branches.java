@@ -52,6 +52,9 @@ public class Branches {
 
     // create a new branch with name as argument
     public static void branch(String name) {
+        if (branches.containsKey(name)) {
+            errorHandler("A branch with that name already exists.", true);
+        }
         Branches.branches.put(name, Branches.head);
     }
 
@@ -145,6 +148,10 @@ public class Branches {
     }
 
     public static void reset(String commitID) {
+        if (Commit.getCommitFromHash(commitID) == null) {
+            errorHandler("No commit with that id exists.", true);
+        }
+
         // if a working file is untracked and would be overwritten
         checkUntrackedFiles(commitID);
 
@@ -165,11 +172,7 @@ public class Branches {
         String log;
         StringBuilder sb;
         List<String> conflictFiles = new ArrayList<>();
-
         TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
-
-        branchHash = branches.get(branch);
-        splitHash = findSplitNode(branchHash, head);
 
         if (!StagingArea.stagedForAddition.isEmpty() || !StagingArea.stagedForRemoval.isEmpty()) {
             errorHandler("You have uncommitted changes.", true);
@@ -178,6 +181,9 @@ public class Branches {
         if (!branches.containsKey(branch)) {
             errorHandler("A branch with that name does not exist.", true);
         }
+
+        branchHash = branches.get(branch);
+        splitHash = findSplitNode(branchHash, head);
 
         if (branch.equals(current)) {
             errorHandler("Cannot merge a branch with itself.", true);
@@ -254,7 +260,7 @@ public class Branches {
         for (String filename : mappingMerge.keySet()) {
             if (!mappingSplit.containsKey(filename) && !mappingCurrent.containsKey(filename)) {
                 StagingArea.record();
-                Repository.checkoutFile(filename, splitHash);
+                Repository.checkoutFile(filename, branchHash);
                 StagingArea.add(filename);
             }
         }

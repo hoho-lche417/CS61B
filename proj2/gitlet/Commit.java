@@ -124,10 +124,26 @@ public class Commit implements Serializable {
     }
 
     public static Commit getCommitFromHash(String hash) {
-        File inFile = createFilePath(Repository.COMMIT_DIR, hash, true);
-        // bug: create an empty file
+        String [] fileList;
+        Commit c;
+        File inFile;
+
+        // handle the case where the input is just the first six digits of the hash
+        if (hash.length() == 6) {
+            // find the match from the hashes in the commit dir
+            fileList = Repository.COMMIT_DIR.list();
+            Arrays.sort(fileList);
+
+            for (String h : fileList) {
+                if (h.substring(0, 6).equals(hash)) {
+                    hash = h;
+                }
+            }
+        }
+
+        inFile = createFilePath(Repository.COMMIT_DIR, hash, true);
         if (inFile != null) {
-            Commit c = readObject(inFile, Commit.class);
+            c = readObject(inFile, Commit.class);
             return c;
         }
         return null;

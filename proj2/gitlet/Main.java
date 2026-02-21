@@ -11,6 +11,9 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
+        if (args.length == 0) {
+            errorHandler("Please enter a command.", true);
+        }
         String firstArg = args[0]; // assume that the cmd is always provided?
         switch(firstArg) {
             case "init":
@@ -65,8 +68,6 @@ public class Main {
                 validateNumArgs(args, 2);
                 Repository.merge(args[1]);
                 break;
-            case "": // what if args is empty?
-                errorHandler("Please enter a command.", true);
             default:
                 errorHandler("No command with that name exists.", true);
         }

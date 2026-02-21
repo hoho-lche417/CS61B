@@ -69,6 +69,7 @@ public class StagingArea {
         commitedFileHash = c.getMapping().get(filename);
         if (commitedFileHash != null && commitedFileHash.equals(hash)) {
             stagedForAddition.remove(filename);
+            return;
         }
 
         if (!stagedForAddition.containsKey(filename)) {
@@ -103,12 +104,20 @@ public class StagingArea {
 
     public static void rm(String filename) {
         TreeMap<String, String> commitMapping;
+
+        commitMapping = Commit.getCommitFromHash(Branches.head).getMapping();
+
+        // If the file is neither staged nor tracked by the head commit
+        if (!stagedForAddition.containsKey(filename) &&
+                !commitMapping.containsKey(filename)) {
+            errorHandler("No reason to remove the file", true);
+        }
+
         // unstage the file if it is currently staged for addition
         stagedForAddition.remove(filename);
 
         // If the file is tracked in the current commit
         // stage it for removal and remove the file from the working directory
-        commitMapping = Commit.getCommitFromHash(Branches.head).getMapping();
         if (commitMapping.containsKey(filename)) {
             stagedForRemoval.put(filename, commitMapping.get(filename));
             restrictedDelete(join(Repository.CWD, filename));
