@@ -224,7 +224,6 @@ public class Branches {
                 if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
                         && mappingCurrent.get(entry.getKey()).equals(entry.getValue())) {
                     mappingCurrent.put(entry.getKey(), mappingMerge.get(entry.getKey()));
-                    // TO DO: double check does it need to be staged?
                     StagingArea.add(entry.getKey());
                 }
 
@@ -255,6 +254,23 @@ public class Branches {
                 conflictFiles.add(entry.getKey());
             }
 
+            // files present at the split point, unmodified in the current branch,
+            // but absent in the given branch should be removed (and untracked).
+            if (mappingCurrent.containsKey(entry.getKey())
+                    && mappingCurrent.get(entry.getKey()).equals(entry.getValue())
+                    && !mappingMerge.containsKey(entry.getKey())) {
+                restrictedDelete(entry.getKey());
+                mappingCurrent.remove(entry.getKey());
+            }
+
+            // files present at the split point, unmodified in the given branch,
+            // but absent in the current branch should remain absent.
+//            if (mappingMerge.containsKey(entry.getKey())
+//                    && mappingMerge.get(entry.getKey()).equals(entry.getValue())
+//                    && !mappingCurrent.containsKey(entry.getKey())) {
+//                restrictedDelete(entry.getKey());
+//                mappingCurrent.remove(entry.getKey());
+//            }
         }
 
         // files not present at the split point but present only in the given branch
@@ -268,8 +284,7 @@ public class Branches {
             }
         }
 
-        //  files present at the split point, unmodified in the given branch,
-        //  but absent in the current branch should remain absent.
+
 
         // conflict if file absent at the split but has different contents in both branches
         for (Map.Entry<String, String> entry : mappingCurrent.entrySet()) {
