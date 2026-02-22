@@ -174,8 +174,9 @@ public class Branches {
         StringBuilder sb;
         List<String> conflictFiles = new ArrayList<>();
         TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
+        File file;
 
-        if (!StagingArea.stagedForAddition.isEmpty() || !StagingArea.stagedForRemoval.isEmpty()) {
+        if (!StagingArea.getStagedForAddition().isEmpty() || !StagingArea.getStagedForRemoval().isEmpty()) {
             errorHandler("You have uncommitted changes.", true);
         }
 
@@ -223,8 +224,12 @@ public class Branches {
                 // should be changed to their versions in the given branch
                 if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
                         && mappingCurrent.get(entry.getKey()).equals(entry.getValue())) {
-                    mappingCurrent.put(entry.getKey(), mappingMerge.get(entry.getKey()));
-                    StagingArea.add(entry.getKey());
+                    //mappingCurrent.put(entry.getKey(), mappingMerge.get(entry.getKey()));
+                    //StagingArea.add(entry.getKey());
+                    file = createFilePath(Repository.CWD, entry.getKey(), false);
+                    writeContents(file, Blob.getBlobFromHash(mappingMerge.get(entry.getKey())).getContents());
+                    StagingArea.getStagedForAddition().put(entry.getKey(),
+                            mappingMerge.get(entry.getKey()));
                 }
 
                 // files that have been modified in the current branch but not in the given branch
@@ -260,7 +265,10 @@ public class Branches {
                     && mappingCurrent.get(entry.getKey()).equals(entry.getValue())
                     && !mappingMerge.containsKey(entry.getKey())) {
                 restrictedDelete(entry.getKey());
-                mappingCurrent.remove(entry.getKey());
+                //mappingCurrent.remove(entry.getKey());
+                // the second parameter is not needed
+                // maybe the map could be replaced by a set later
+                StagingArea.getStagedForRemoval().put(entry.getKey(), null);
             }
 
             // files present at the split point, unmodified in the given branch,
@@ -281,10 +289,12 @@ public class Branches {
                 StagingArea.record();
                 Repository.checkoutFile(filename, branchHash);
                 StagingArea.add(filename);
+//                file = createFilePath(Repository.CWD, filename, false);
+//                writeContents(file, Blob.getBlobFromHash(mappingMerge.get(filename)).getContents());
+//                StagingArea.getStagedForAddition().put(filename,
+//                        mappingMerge.get(filename));
             }
         }
-
-
 
         // conflict if file absent at the split but has different contents in both branches
         for (Map.Entry<String, String> entry : mappingCurrent.entrySet()) {
