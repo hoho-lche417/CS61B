@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import static gitlet.Utils.*;
-import static gitlet.Utils.errorHandler;
+import static gitlet.Utils.eventMessageHandler;
 
 /** Represents the branch mechanism
  *  essentially, it should be part of the repository class,
@@ -15,12 +15,25 @@ import static gitlet.Utils.errorHandler;
 public class Branches {
 
     // a mapping from branch names to the hashes
-    public static TreeMap<String, String> branches = new TreeMap<>();
+    private static TreeMap<String, String> branches = new TreeMap<>();
 
-    public static String head;
+    private static String head;
 
     // current branch name
-    public static String current;
+    private static String current;
+
+    public static TreeMap<String, String> getBranches() {
+        return branches;
+    }
+
+    public static String getHead() {
+        return head;
+    }
+
+    public static String getCurrent() {
+        return current;
+    }
+
 
     public static void init(String hash) {
         branches.put("master", hash);
@@ -29,20 +42,25 @@ public class Branches {
     }
 
     public static void load() {
-        head = readContentsAsString(createFilePath(Repository.REF_DIR, "head", false));
+        head = readContentsAsString(
+                createFilePath(Repository.REF_DIR, "head", false));
 
-        current = readContentsAsString(createFilePath(Repository.REF_DIR, "current", false));
+        current = readContentsAsString(
+                createFilePath(Repository.REF_DIR, "current", false));
 
         branches = (TreeMap<String, String>) readObject(createFilePath(Repository.REF_DIR,
                 "branches", false), TreeMap.class);
     }
 
     public static void record() {
-        writeContents(createFilePath(Repository.REF_DIR, "head", false), head);
+        writeContents(createFilePath(
+                Repository.REF_DIR, "head", false), head);
 
-        writeContents(createFilePath(Repository.REF_DIR, "current", false), current);
+        writeContents(createFilePath(
+                Repository.REF_DIR, "current", false), current);
 
-        writeObject(createFilePath(Repository.REF_DIR, "branches", false), branches);
+        writeObject(createFilePath(
+                Repository.REF_DIR, "branches", false), branches);
     }
 
     public static void updateHead(String hash) {
@@ -53,7 +71,7 @@ public class Branches {
     // create a new branch with name as argument
     public static void branch(String name) {
         if (branches.containsKey(name)) {
-            errorHandler("A branch with that name already exists.", true);
+            eventMessageHandler("A branch with that name already exists.", true);
         }
         Branches.branches.put(name, Branches.head);
     }
@@ -64,11 +82,11 @@ public class Branches {
      */
     public static void rmbranch(String name) {
         if (!branches.containsKey(name)) {
-            errorHandler("A branch with that name does not exist.", true);
+            eventMessageHandler("A branch with that name does not exist.", true);
         }
 
         if (current.equals(name)) {
-            errorHandler("Cannot remove the current branch.", true);
+            eventMessageHandler("Cannot remove the current branch.", true);
         }
 
         branches.remove(name);
@@ -80,11 +98,11 @@ public class Branches {
     public static void checkout(String branch) {
 
         if (!branches.keySet().contains(branch)) {
-            errorHandler("No such branch exists.", true);
+            eventMessageHandler("No such branch exists.", true);
         }
 
         if (current.equals(branch)) {
-            errorHandler("No need to checkout the current branch.", true);
+            eventMessageHandler("No need to checkout the current branch.", true);
         }
 
         // if a working file is untracked and would be overwritten
@@ -112,7 +130,7 @@ public class Branches {
 
         for (String filename : fileList) {
             if (!mappingCurrent.containsKey(filename) && mappingCheckout.containsKey(filename)) {
-                errorHandler("There is an untracked file in the way; delete it, "
+                eventMessageHandler("There is an untracked file in the way; delete it, "
                         + "or add and commit it first.", true);
             }
         }
@@ -150,7 +168,7 @@ public class Branches {
 
     public static void reset(String commitID) {
         if (Commit.getCommitFromHash(commitID) == null) {
-            errorHandler("No commit with that id exists.", true);
+            eventMessageHandler("No commit with that id exists.", true);
         }
 
         // if a working file is untracked and would be overwritten
@@ -164,37 +182,26 @@ public class Branches {
     }
 
     /**
-     * merge the branch given by the parameter into the current branch
-     * @param branch the branch name to be merged into the current branch
+     * helper function originally part of the merge function
+     * but factored out due to the size of the merge function
+     * @param branch the name of the branch
+     * returns the splitHash so that the merge function doesn't
+     *               need to compute it again
      */
-    public static void merge(String branch) {
-        String splitHash, branchHash;
+    private static void trivialCaseHandler(String branch,
+                                           String splitHash) {
+        String branchHash;
         String oldBranch;
-        String log;
-        StringBuilder sb;
-        List<String> conflictFiles = new ArrayList<>();
-        TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
-        File file;
-
-        if (!StagingArea.getStagedForAddition().isEmpty() || !StagingArea.getStagedForRemoval().isEmpty()) {
-            errorHandler("You have uncommitted changes.", true);
-        }
-
-        if (!branches.containsKey(branch)) {
-            errorHandler("A branch with that name does not exist.", true);
-        }
 
         branchHash = branches.get(branch);
-        splitHash = findSplitNode(branchHash, head);
 
         if (branch.equals(current)) {
-            errorHandler("Cannot merge a branch with itself.", true);
+            eventMessageHandler("Cannot merge a branch with itself.", true);
         }
 
         // if split node is the same as the branch to be merged
         if (splitHash.equals(branchHash)) {
-            System.out.println("Given branch is an ancestor of the current branch.");
-            return;
+            eventMessageHandler("Given branch is an ancestor of the current branch.", true);
         }
 
         // if split node is the current branch
@@ -203,60 +210,55 @@ public class Branches {
             checkout(branch);
             branches.put(oldBranch, head);
             current = oldBranch;
-            System.out.println("Current branch fast-forwarded.");
-            return;
+            eventMessageHandler("Current branch fast-forwarded.", true);
+        }
+    }
+
+    /**
+     * merge the branch given by the parameter into the current branch
+     * @param branch the branch name to be merged into the current branch
+     */
+    public static void merge(String branch) {
+        String splitHash, branchHash, log;
+        List<String> conflictFiles = new ArrayList<>();
+        TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
+        File file;
+
+        if (!StagingArea.getStagedForAddition().isEmpty() ||
+                !StagingArea.getStagedForRemoval().isEmpty()) {
+            eventMessageHandler("You have uncommitted changes.", true);
+        }
+
+        if (!branches.containsKey(branch)) {
+            eventMessageHandler("A branch with that name does not exist.", true);
         }
 
         checkUntrackedFiles(branches.get(branch));
+
+        branchHash = branches.get(branch);
+        splitHash = findSplitNode(branchHash, head);
+
+        trivialCaseHandler(branch, splitHash);
 
         mappingSplit = Commit.getCommitFromHash(splitHash).getMapping();
         mappingCurrent = Commit.getCommitFromHash(head).getMapping();
         mappingMerge = Commit.getCommitFromHash(branchHash).getMapping();
 
         for (Map.Entry<String, String> entry : mappingSplit.entrySet()) {
-
             // both branch contains the file
             if (mappingMerge.containsKey(entry.getKey())
                     && mappingCurrent.containsKey(entry.getKey())) {
-
                 // files modified in the given branch since the split
                 // but not modified in the current branch
                 // should be changed to their versions in the given branch
                 if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
                         && mappingCurrent.get(entry.getKey()).equals(entry.getValue())) {
-                    //mappingCurrent.put(entry.getKey(), mappingMerge.get(entry.getKey()));
-                    //StagingArea.add(entry.getKey());
                     file = createFilePath(Repository.CWD, entry.getKey(), false);
-                    writeContents(file, Blob.getBlobFromHash(mappingMerge.get(entry.getKey())).getContents());
+                    writeContents(file, Blob.getBlobFromHash(
+                            mappingMerge.get(entry.getKey())).getContents());
                     StagingArea.getStagedForAddition().put(entry.getKey(),
                             mappingMerge.get(entry.getKey()));
                 }
-
-                // files that have been modified in the current branch but not in the given branch
-                // since the split should stay as they are
-
-                // files modified in both branches in the same way
-                // (i.e., same content or both removed) are left unchanged
-
-                // conflict if contents of both are changed and different from other
-                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
-                        && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
-                        && !mappingCurrent.get(entry.getKey()).equals(mappingMerge.get(entry.getKey()))) {
-                    conflictFiles.add(entry.getKey());
-                }
-            }
-
-            // conflict if contents of one are changed and the other file is deleted
-            if (mappingMerge.containsKey(entry.getKey())
-                    && !mappingMerge.get(entry.getKey()).equals(entry.getValue())
-                    && !mappingCurrent.containsKey(entry.getKey())) {
-                conflictFiles.add(entry.getKey());
-            }
-
-            if (mappingCurrent.containsKey(entry.getKey())
-                    && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
-                    && !mappingMerge.containsKey(entry.getKey())) {
-                conflictFiles.add(entry.getKey());
             }
 
             // files present at the split point, unmodified in the current branch,
@@ -265,20 +267,9 @@ public class Branches {
                     && mappingCurrent.get(entry.getKey()).equals(entry.getValue())
                     && !mappingMerge.containsKey(entry.getKey())) {
                 restrictedDelete(entry.getKey());
-                //mappingCurrent.remove(entry.getKey());
-                // the second parameter is not needed
                 // maybe the map could be replaced by a set later
                 StagingArea.getStagedForRemoval().put(entry.getKey(), null);
             }
-
-            // files present at the split point, unmodified in the given branch,
-            // but absent in the current branch should remain absent.
-//            if (mappingMerge.containsKey(entry.getKey())
-//                    && mappingMerge.get(entry.getKey()).equals(entry.getValue())
-//                    && !mappingCurrent.containsKey(entry.getKey())) {
-//                restrictedDelete(entry.getKey());
-//                mappingCurrent.remove(entry.getKey());
-//            }
         }
 
         // files not present at the split point but present only in the given branch
@@ -289,11 +280,52 @@ public class Branches {
                 StagingArea.record();
                 Repository.checkoutFile(filename, branchHash);
                 StagingArea.add(filename);
-//                file = createFilePath(Repository.CWD, filename, false);
-//                writeContents(file, Blob.getBlobFromHash(mappingMerge.get(filename)).getContents());
-//                StagingArea.getStagedForAddition().put(filename,
-//                        mappingMerge.get(filename));
             }
+        }
+
+        conflictFiles = checkConflict(branch, mappingSplit);
+        conflictHandler(conflictFiles, mappingCurrent, mappingMerge);
+
+        StagingArea.record();
+        log = String.format("Merged %s into %s.", branch, current);
+        Repository.commit(log, branches.get(branch));
+    }
+
+    private static List<String> checkConflict(String branch,
+                                      TreeMap<String, String> mappingSplit) {
+        String branchHash;
+        List<String> conflictFiles = new ArrayList<>();
+        TreeMap<String, String> mappingCurrent, mappingMerge;
+
+        branchHash = branches.get(branch);
+        mappingCurrent = Commit.getCommitFromHash(head).getMapping();
+        mappingMerge = Commit.getCommitFromHash(branchHash).getMapping();
+
+        for (Map.Entry<String, String> entry : mappingSplit.entrySet()) {
+            // both branch contains the file
+            if (mappingMerge.containsKey(entry.getKey())
+                    && mappingCurrent.containsKey(entry.getKey())) {
+                // conflict if contents of both are changed and different from other
+                if (!mappingMerge.get(entry.getKey()).equals(entry.getValue())
+                        && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
+                        && !mappingCurrent.get(entry.getKey()).equals(
+                        mappingMerge.get(entry.getKey()))) {
+                    conflictFiles.add(entry.getKey());
+                }
+            }
+
+            // conflict if contents of one are changed and the other file is deleted
+            if (mappingMerge.containsKey(entry.getKey())
+                    && !mappingMerge.get(entry.getKey()).equals(entry.getValue())
+                    && !mappingCurrent.containsKey(entry.getKey())) {
+                conflictFiles.add(entry.getKey());
+            }
+            if (mappingCurrent.containsKey(entry.getKey())
+                    && !mappingCurrent.get(entry.getKey()).equals(entry.getValue())
+                    && !mappingMerge.containsKey(entry.getKey())) {
+                conflictFiles.add(entry.getKey());
+            }
+
         }
 
         // conflict if file absent at the split but has different contents in both branches
@@ -305,7 +337,15 @@ public class Branches {
             }
         }
 
-        // conflict handler
+        return conflictFiles;
+    }
+
+    // helper function
+    private static void conflictHandler(List<String> conflictFiles,
+                                        TreeMap<String, String> mappingCurrent,
+                                        TreeMap<String, String> mappingMerge) {
+        StringBuilder sb;
+
         for (String filename : conflictFiles) {
             sb = new StringBuilder("<<<<<<< HEAD\n");
             if (mappingCurrent.containsKey(filename)) {
@@ -323,10 +363,8 @@ public class Branches {
             System.out.println("Encountered a merge conflict.");
         }
 
-        StagingArea.record();
-        log = String.format("Merged %s into %s.", branch, current);
-        Repository.commit(log, branches.get(branch));
     }
+
 
     /**
      * find the split node given the two commit hashes using BSF graph traversal
@@ -371,7 +409,7 @@ public class Branches {
 
             Commit c = Commit.getCommitFromHash(h);
 
-            if (c.getParentHash() != null && !dist.containsKey(c.getParentHash() )) {
+            if (c.getParentHash() != null && !dist.containsKey(c.getParentHash())) {
                 dist.put(c.getParentHash(), d + 1);
                 q.add(c.getParentHash());
             }
@@ -384,6 +422,8 @@ public class Branches {
 
         return dist;
     }
+
+
 
 
 }

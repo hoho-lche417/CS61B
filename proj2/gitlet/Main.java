@@ -12,7 +12,7 @@ public class Main {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            errorHandler("Please enter a command.", true);
+            eventMessageHandler("Please enter a command.", true);
         }
         String firstArg = args[0]; // assume that the cmd is always provided?
         switch(firstArg) {
@@ -69,7 +69,7 @@ public class Main {
                 Repository.merge(args[1]);
                 break;
             default:
-                errorHandler("No command with that name exists.", true);
+                eventMessageHandler("No command with that name exists.", true);
         }
     }
 
@@ -79,7 +79,7 @@ public class Main {
      */
     private static void validateNumArgs(String[] args, int n) {
         if (args.length != n) {
-            errorHandler("Incorrect operands.", true);
+            eventMessageHandler("Incorrect operands.", true);
         }
     }
 
@@ -92,7 +92,7 @@ public class Main {
         } else if (args.length == 2){
             Repository.checkoutBranch(args[1]);
         } else {
-            errorHandler("Incorrect operands.", true);
+            eventMessageHandler("Incorrect operands.", true);
         }
     }
 

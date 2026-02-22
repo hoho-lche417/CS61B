@@ -85,7 +85,7 @@ public class Repository {
          * print the message Not in an initialized Gitlet directory.
          */
         if (!GITLET_DIR.exists()) {
-            errorHandler("Not in an initialized Gitlet directory.", true);
+            eventMessageHandler("Not in an initialized Gitlet directory.", true);
         }
 
         Branches.load();
@@ -119,15 +119,16 @@ public class Repository {
         Commit c;
 
         load();
-        if (StagingArea.getStagedForAddition().isEmpty() && StagingArea.getStagedForRemoval().isEmpty()) {
-            errorHandler("No changes added to the commit.", true);
+        if (StagingArea.getStagedForAddition().isEmpty() &&
+                StagingArea.getStagedForRemoval().isEmpty()) {
+            eventMessageHandler("No changes added to the commit.", true);
         }
 
         if (msg == null || msg.equals("")) {
-            errorHandler("Please enter a commit message.", true);
+            eventMessageHandler("Please enter a commit message.", true);
         }
 
-        c = new Commit(msg, now, Branches.head, mergeID);
+        c = new Commit(msg, now, Branches.getHead(), mergeID);
 
         // set head pointer
         Branches.updateHead(c.getHash());
@@ -142,7 +143,7 @@ public class Repository {
 
         load();
 
-        ptrCommit = Branches.head;
+        ptrCommit = Branches.getHead();
         while (ptrCommit != null) {
             c = Commit.getCommitFromHash(ptrCommit);
             c.printCommit();
@@ -189,7 +190,7 @@ public class Repository {
         }
 
         if (!found) {
-            errorHandler("Found no commit with that message.", false);
+            eventMessageHandler("Found no commit with that message.", false);
         }
 
         // no need to record()
@@ -216,12 +217,12 @@ public class Repository {
         load();
 
         if (commitID == null) {
-            c = Commit.getCommitFromHash(Branches.head);
+            c = Commit.getCommitFromHash(Branches.getHead());
         } else {
             // maybe make commit ID to six digits only?
             c = Commit.getCommitFromHash(commitID);
             if (c == null) {
-                errorHandler("No commit with that id exists.", true);
+                eventMessageHandler("No commit with that id exists.", true);
             }
         }
 
@@ -232,7 +233,7 @@ public class Repository {
             b = Blob.getBlobFromHash(mapping.get(filename));
             writeContents(file, b.getContents());
         } else {
-            errorHandler("File does not exist in that commit.", true);
+            eventMessageHandler("File does not exist in that commit.", true);
         }
 
         record();
@@ -256,8 +257,8 @@ public class Repository {
         load();
 
         System.out.println("=== Branches ===");
-        for (String branch : Branches.branches.keySet()) {
-            System.out.println(((Branches.current.equals(branch)) ? "*" : "") + branch);
+        for (String branch : Branches.getBranches().keySet()) {
+            System.out.println(((Branches.getCurrent().equals(branch)) ? "*" : "") + branch);
         }
         System.out.println();
 
@@ -293,8 +294,8 @@ public class Repository {
 
     private static void validateNewRepo() {
         if (GITLET_DIR.exists()) {
-            errorHandler("A Gitlet version-control system " +
-                    "already exists in the current directory.", true);
+            eventMessageHandler("A Gitlet version-control system "
+                    + "already exists in the current directory.", true);
         }
     }
 

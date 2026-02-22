@@ -63,7 +63,7 @@ public class StagingArea {
         List<String> filenameList = plainFilenamesIn(Repository.CWD);
 
         if (!filenameList.contains(filename)) {
-            errorHandler("File does not exist.", true);
+            eventMessageHandler("File does not exist.", true);
         }
 
         String contents = readContentsAsString(join(Repository.CWD, filename));
@@ -77,10 +77,10 @@ public class StagingArea {
         stagedForRemoval.remove(filename);
 
         // if same as current commit, remove mapping
-        c = Commit.getCommitFromHash(Branches.head);
+        c = Commit.getCommitFromHash(Branches.getHead());
         commitedFileHash = c.getMapping().get(filename);
-        if (commitedFileHash != null &&
-                commitedFileHash.equals(hash)) {
+        if (commitedFileHash != null
+                && commitedFileHash.equals(hash)) {
             stagedForAddition.remove(filename);
             return;
         }
@@ -118,12 +118,12 @@ public class StagingArea {
     public static void rm(String filename) {
         TreeMap<String, String> commitMapping;
 
-        commitMapping = Commit.getCommitFromHash(Branches.head).getMapping();
+        commitMapping = Commit.getCommitFromHash(Branches.getHead()).getMapping();
 
         // If the file is neither staged nor tracked by the head commit
         if (!stagedForAddition.containsKey(filename)
                 && !commitMapping.containsKey(filename)) {
-            errorHandler("No reason to remove the file", true);
+            eventMessageHandler("No reason to remove the file", true);
         }
 
         // unstage the file if it is currently staged for addition
