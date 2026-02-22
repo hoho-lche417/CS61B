@@ -224,8 +224,8 @@ public class Branches {
         TreeMap<String, String> mappingCurrent, mappingMerge, mappingSplit;
         File file;
 
-        if (!StagingArea.getStagedForAddition().isEmpty() ||
-                !StagingArea.getStagedForRemoval().isEmpty()) {
+        if (!StagingArea.getStagedForAddition().isEmpty()
+                || !StagingArea.getStagedForRemoval().isEmpty()) {
             eventMessageHandler("You have uncommitted changes.", true);
         }
 

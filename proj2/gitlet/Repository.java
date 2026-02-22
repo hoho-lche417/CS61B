@@ -119,8 +119,8 @@ public class Repository {
         Commit c;
 
         load();
-        if (StagingArea.getStagedForAddition().isEmpty() &&
-                StagingArea.getStagedForRemoval().isEmpty()) {
+        if (StagingArea.getStagedForAddition().isEmpty()
+                && StagingArea.getStagedForRemoval().isEmpty()) {
             eventMessageHandler("No changes added to the commit.", true);
         }
 
