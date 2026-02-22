@@ -119,7 +119,7 @@ public class Repository {
         Commit c;
 
         load();
-        if (StagingArea.stagedForAddition.isEmpty() && StagingArea.stagedForRemoval.isEmpty()) {
+        if (StagingArea.getStagedForAddition().isEmpty() && StagingArea.getStagedForRemoval().isEmpty()) {
             errorHandler("No changes added to the commit.", true);
         }
 
@@ -201,7 +201,7 @@ public class Repository {
         record();
     }
 
-    public static void rm_branch(String name) {
+    public static void rmbranch(String name) {
         load();
         Branches.rmbranch(name);
         record();
@@ -262,13 +262,13 @@ public class Repository {
         System.out.println();
 
         System.out.println("=== Staged Files ===");
-        for (String staged : StagingArea.stagedForAddition.keySet()) {
+        for (String staged : StagingArea.getStagedForAddition().keySet()) {
             System.out.println(staged);
         }
         System.out.println();
 
         System.out.println("=== Removed Files ===");
-        for (String staged : StagingArea.stagedForRemoval.keySet()) {
+        for (String staged : StagingArea.getStagedForRemoval().keySet()) {
             System.out.println(staged);
         }
         System.out.println();
@@ -293,7 +293,8 @@ public class Repository {
 
     private static void validateNewRepo() {
         if (GITLET_DIR.exists()) {
-            errorHandler("A Gitlet version-control system already exists in the current directory.", true);
+            errorHandler("A Gitlet version-control system " +
+                    "already exists in the current directory.", true);
         }
     }
 

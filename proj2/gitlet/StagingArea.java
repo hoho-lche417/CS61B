@@ -7,7 +7,8 @@ import java.util.TreeMap;
 import static gitlet.Utils.*;
 
 /** Represents the staging area mechanism
- *  essentially, it should be part of the repository class, but due to the relative size of the logic
+ *  essentially, it should be part of the repository class,
+ *  but due to the relative size of the logic
  *  it is separated out as a standalone class
  *  @author Hoho
  */
@@ -15,9 +16,9 @@ public class StagingArea {
 
     /** a map from filenames to hash strings (representing blobs)
      * always have the same order compared to HashMap */
-    public static TreeMap<String, String> stagedForAddition;
+    private static TreeMap<String, String> stagedForAddition;
 
-    public static TreeMap<String, String> stagedForRemoval;
+    private static TreeMap<String, String> stagedForRemoval;
 
     public static void load() {
         File file = join(Repository.REF_DIR, "staged_add");
@@ -34,6 +35,14 @@ public class StagingArea {
         }
     }
 
+    public static TreeMap<String, String> getStagedForAddition() {
+        return stagedForAddition;
+    }
+
+    public static TreeMap<String, String> getStagedForRemoval() {
+        return stagedForRemoval;
+    }
+
     public static void clear() {
         stagedForAddition.clear();
         stagedForRemoval.clear();
@@ -46,6 +55,10 @@ public class StagingArea {
         writeObject(file, stagedForRemoval);
     }
 
+    /**
+     * add the file to the staging area
+     * @param filename the name of the file
+     */
     public static void add(String filename) {
         List<String> filenameList = plainFilenamesIn(Repository.CWD);
 
@@ -66,7 +79,8 @@ public class StagingArea {
         // if same as current commit, remove mapping
         c = Commit.getCommitFromHash(Branches.head);
         commitedFileHash = c.getMapping().get(filename);
-        if (commitedFileHash != null && commitedFileHash.equals(hash)) {
+        if (commitedFileHash != null &&
+                commitedFileHash.equals(hash)) {
             stagedForAddition.remove(filename);
             return;
         }

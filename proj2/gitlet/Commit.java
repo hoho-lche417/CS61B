@@ -84,12 +84,12 @@ public class Commit implements Serializable {
     }
 
     private void update() {
-        for (Map.Entry<String, String> staged : StagingArea.stagedForAddition.entrySet()) {
+        for (Map.Entry<String, String> staged : StagingArea.getStagedForAddition().entrySet()) {
             // track new files and update files based on staged area for adding
             fileMap.put(staged.getKey(), staged.getValue());
         }
 
-        for (Map.Entry<String, String> staged : StagingArea.stagedForRemoval.entrySet()) {
+        for (Map.Entry<String, String> staged : StagingArea.getStagedForRemoval().entrySet()) {
             // files tracked in the current commit will be untracked in the new commit
             fileMap.remove(staged.getKey());
         }
@@ -114,9 +114,13 @@ public class Commit implements Serializable {
         System.out.println("===");
         System.out.println("commit " + hash);
 
-        // TO DO: need to double check after implementing merge
+        // need to double check after implementing merge
         if (parentHash2 != null) {
-            System.out.println("Merge: " + parentHash.substring(0, 7) + " " + parentHash2.substring(0, 7));
+            System.out.println(String.format(
+                    "Merge: %s %s", parentHash.substring(0, 7),
+                    parentHash2.substring(0, 7)));
+//            System.out.println("Merge: " + parentHash.substring(0, 7) +
+//                    " " + parentHash2.substring(0, 7));
         }
 
         System.out.println("Date: " + sdf.format(date));
@@ -160,11 +164,11 @@ public class Commit implements Serializable {
     }
 
     public static void main(String[] args) {
-        File inFile = join(Repository.COMMIT_DIR, "81910db269b64314ce663b6a34a388b0123b4035");
+        File inFile = join(Repository.COMMIT_DIR, "3921c9f9f7c94b2e43bb5133eba2eced5b68c71f");
         System.out.println(inFile);
         if (inFile.exists()) {
             //Commit c = readObject(inFile, Commit.class);
-            Commit c = Commit.getCommitFromHash("81910db269b64314ce663b6a34a388b0123b4035");
+            Commit c = Commit.getCommitFromHash("3921c9f9f7c94b2e43bb5133eba2eced5b68c71f");
             c.printCommit();
             c.debugPrint();
         }
