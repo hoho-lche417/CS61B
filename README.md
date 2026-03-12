@@ -1,0 +1,1 @@
+The repo holds the assignments and projects for the free online course [CS61B: Structure and Interpretation of Computer Programs](https://sp21.datastructur.es/). The version from 2021 is freely accessible to the public with gradescope code.
